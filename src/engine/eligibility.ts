@@ -380,8 +380,8 @@ export function computeEligibility(state: WizardState): EligibilityResult {
   }
 
   // Interest rate range (adjusted for credit)
-  let rateMin = POLICY.interestRates.floating.min;
-  let rateMax = POLICY.interestRates.floating.max;
+  let rateMin: number = POLICY.interestRates.floating.min;
+  let rateMax: number = POLICY.interestRates.floating.max;
   if (rateType === 'fixed') {
     rateMin = POLICY.interestRates.fixed.rate;
     rateMax = POLICY.interestRates.fixed.rate;

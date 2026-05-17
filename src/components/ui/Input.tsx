@@ -3,7 +3,7 @@ import React from 'react';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   hint?: string;
-  prefix?: React.ReactNode;
+  inputPrefix?: React.ReactNode;
   suffix?: React.ReactNode;
 }
 
@@ -18,17 +18,17 @@ const baseInput = [
 
 const errorInput = 'border-red-400 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500';
 
-export function Input({ error, hint, prefix, suffix, className = '', ...props }: InputProps) {
+export function Input({ error, hint, inputPrefix, suffix, className = '', ...props }: InputProps) {
   return (
     <div className="w-full">
       <div className="relative flex items-center">
-        {prefix && (
+        {inputPrefix && (
           <span className="absolute left-3 text-sm text-gray-500 dark:text-gray-400 pointer-events-none select-none">
-            {prefix}
+            {inputPrefix}
           </span>
         )}
         <input
-          className={[baseInput, error ? errorInput : '', prefix ? 'pl-8' : '', suffix ? 'pr-10' : '', className].join(' ')}
+          className={[baseInput, error ? errorInput : '', inputPrefix ? 'pl-8' : '', suffix ? 'pr-10' : '', className].join(' ')}
           aria-invalid={!!error}
           {...props}
         />
@@ -52,7 +52,7 @@ export function Input({ error, hint, prefix, suffix, className = '', ...props }:
 
 // ─── Currency Input ───────────────────────────────────────────────────────────
 
-interface CurrencyInputProps extends Omit<InputProps, 'type' | 'prefix' | 'onChange'> {
+interface CurrencyInputProps extends Omit<InputProps, 'type' | 'inputPrefix' | 'onChange'> {
   value: number | '';
   onChange: (val: number | '') => void;
 }
@@ -69,7 +69,7 @@ export function CurrencyInput({ value, onChange, ...props }: CurrencyInputProps)
     <Input
       type="text"
       inputMode="numeric"
-      prefix="₹"
+      inputPrefix="₹"
       value={value === '' ? '' : value.toLocaleString('en-IN')}
       onChange={handleChange}
       {...props}
