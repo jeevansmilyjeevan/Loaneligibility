@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Loan Eligibility Checker — Help Manual</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #263347;
+    --border: #334155;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .layout { display: flex; min-height: 100vh; }
+  nav {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
+  nav .logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  nav .logo h1 { font-size: 14px; font-weight: 700; color: var(--accent); }
+  nav .logo p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  nav ul { list-style: none; }
+  nav ul li a {
+    display: block; padding: 7px 20px; font-size: 13px; color: var(--muted);
+    transition: all 0.15s; border-left: 2px solid transparent;
+  }
+  nav ul li a:hover { color: var(--text); background: var(--surface2); }
+  nav ul li.active a { color: var(--accent); border-left-color: var(--accent); background: rgba(59,130,246,0.08); }
+  nav .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted);
+    padding: 14px 20px 6px; text-transform: uppercase;
+  }
+  main { flex: 1; max-width: 900px; padding: 40px 48px; overflow-x: hidden; }
+
+  h1.page-title {
+    font-size: 30px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+  h2 { font-size: 22px; font-weight: 700; color: var(--text); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 17px; font-weight: 600; color: var(--blue); margin: 24px 0 10px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--cyan); margin: 16px 0 8px; }
+  p { margin-bottom: 12px; color: #cbd5e1; }
+
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+  }
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-blue { background: rgba(96,165,250,0.15); color: var(--blue); }
+
+  .formula-box {
+    background: #0a0f1e; border: 1px solid var(--accent); border-radius: 10px;
+    padding: 18px 22px; margin: 14px 0; font-family: 'Courier New', monospace; font-size: 14px; overflow-x: auto;
+  }
+  .formula-box .formula-title {
+    font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+  }
+  .formula-box .formula-main { font-size: 15px; color: #e2e8f0; line-height: 2.2; }
+  .formula-box .formula-vars {
+    margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;
+    font-size: 12px; color: var(--muted); font-family: -apple-system, sans-serif;
+  }
+  .formula-box .formula-vars .var-row { margin-bottom: 4px; }
+  .formula-box .formula-vars dt { display: inline; color: var(--cyan); font-weight: 600; }
+  .formula-box .formula-vars dd { display: inline; margin-left: 4px; }
+
+  .worked-example {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-left: 3px solid var(--green); border-radius: 8px; padding: 16px 20px; margin: 14px 0;
+  }
+  .worked-example .we-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 12px;
+  }
+  .worked-example .we-inputs {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-bottom: 12px;
+  }
+  .we-input-item { font-size: 13px; color: var(--muted); }
+  .we-input-item span { color: var(--text); font-weight: 600; }
+  .we-steps { font-size: 13px; color: #cbd5e1; margin-bottom: 10px; }
+  .we-steps .step-line { margin-bottom: 6px; font-family: 'Courier New', monospace; font-size: 13px; }
+  .we-steps .step-line .label { color: var(--muted); font-family: -apple-system, sans-serif; margin-right: 6px; }
+  .we-result {
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); border-radius: 6px;
+    padding: 10px 14px; font-size: 14px; font-weight: 700; color: var(--green); font-family: 'Courier New', monospace;
+  }
+
+  .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin: 14px 0; }
+  .info-card.warning { border-left: 3px solid var(--amber); }
+  .info-card.info { border-left: 3px solid var(--blue); }
+  .info-card.danger { border-left: 3px solid var(--red); }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
+  .data-table th {
+    background: var(--surface2); padding: 9px 14px; text-align: left;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 9px 14px; border-bottom: 1px solid rgba(51,65,85,0.5); color: #cbd5e1; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table .highlight { color: var(--text); font-weight: 600; }
+  .data-table .mono { font-family: 'Courier New', monospace; }
+
+  .step-header {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+    padding: 16px 20px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border);
+  }
+  .step-number {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; flex-shrink: 0; color: white;
+  }
+  .step-header h3 { margin: 0; font-size: 18px; }
+
+  .field-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin: 12px 0; }
+  .field-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .field-item .field-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .field-item .field-val { font-size: 14px; font-weight: 600; color: var(--text); }
+  .field-item .field-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .category-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    padding: 10px 14px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);
+  }
+  .cat-label { width: 160px; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  .cat-bar-wrap { flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px; height: 8px; }
+  .cat-bar { height: 8px; border-radius: 4px; }
+  .cat-bar.pass { background: var(--green); }
+  .cat-bar.warning { background: var(--amber); }
+  .cat-bar.fail { background: var(--red); }
+  .cat-score { width: 110px; text-align: right; font-size: 12px; font-weight: 600; color: var(--text); font-family: 'Courier New', monospace; flex-shrink: 0; }
+
+  .outcome-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0; }
+  .outcome-card { padding: 14px 16px; border-radius: 8px; border: 1px solid; }
+  .outcome-card h4 { font-size: 13px; margin: 0 0 4px; }
+  .outcome-card p { font-size: 12px; margin: 0; }
+  .oc-eligible { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+  .oc-eligible h4 { color: var(--green); }
+  .oc-cond { border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.05); }
+  .oc-cond h4 { color: var(--blue); }
+  .oc-review { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+  .oc-review h4 { color: var(--amber); }
+  .oc-no { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+  .oc-no h4 { color: var(--red); }
+
+  .hero {
+    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.1));
+    border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 24px 28px; margin-bottom: 32px;
+  }
+  .hero p { color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 0; }
+
+  .scenario-box {
+    background: linear-gradient(135deg, rgba(34,211,238,0.05), rgba(59,130,246,0.05));
+    border: 1px solid rgba(34,211,238,0.2); border-radius: 10px; padding: 18px 22px; margin: 16px 0;
+  }
+  .scenario-box .scenario-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; }
+  .scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .scenario-item .s-label { font-size: 11px; color: var(--muted); }
+  .scenario-item .s-val { font-size: 14px; font-weight: 700; color: var(--text); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  @media (max-width: 800px) {
+    nav { display: none; }
+    main { padding: 24px 20px; }
+    .outcome-cards { grid-template-columns: 1fr; }
+    .we-inputs { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- Navigation -->
+<nav>
+  <div class="logo">
+    <h1>Help Manual</h1>
+    <p>Home Loan Eligibility Checker v1.0</p>
+  </div>
+  <div class="section-label">Overview</div>
+  <ul>
+    <li><a href="#overview">What is This Tool?</a></li>
+    <li><a href="#workflow">11-Step Workflow</a></li>
+    <li><a href="#scenario">Reference Scenario</a></li>
+  </ul>
+  <div class="section-label">Steps &amp; Forms</div>
+  <ul>
+    <li><a href="#step1">Step 1 — Loan Requirement</a></li>
+    <li><a href="#step2">Step 2 — Applicant Profile</a></li>
+    <li><a href="#step3">Step 3 — Property Details</a></li>
+    <li><a href="#step4">Step 4 — Credit Profile</a></li>
+    <li><a href="#step5">Step 5 — Income &amp; FOIR</a></li>
+    <li><a href="#step6">Step 6 — Co-Applicant</a></li>
+    <li><a href="#step7">Step 7 — Loan Preferences</a></li>
+    <li><a href="#step8">Step 8 — Documents</a></li>
+    <li><a href="#step9">Step 9 — Declarations</a></li>
+    <li><a href="#step10">Step 10 — Review &amp; Score</a></li>
+    <li><a href="#step11">Step 11 — Final Decision</a></li>
+  </ul>
+  <div class="section-label">Key Formulas</div>
+  <ul>
+    <li><a href="#calc-emi">EMI Formula</a></li>
+    <li><a href="#calc-ltv">LTV &amp; Property Value</a></li>
+    <li><a href="#calc-foir">FOIR Formula</a></li>
+    <li><a href="#calc-age">Age at Maturity</a></li>
+    <li><a href="#calc-scoring">Category Scoring</a></li>
+    <li><a href="#calc-normalization">Score Normalization</a></li>
+    <li><a href="#calc-outcomes">Outcome Mapping</a></li>
+  </ul>
+  <div class="section-label">Per-Step Formulas</div>
+  <ul>
+    <li><a href="#step1">Step 1 — Overage &amp; Limits</a></li>
+    <li><a href="#step2">Step 2 — Age &amp; Ceiling</a></li>
+    <li><a href="#step3">Step 3 — LTV (4 sub-formulas)</a></li>
+    <li><a href="#step4">Step 4 — Credit (3 modifiers)</a></li>
+    <li><a href="#step5">Step 5 — EMI, FOIR, Max Loan</a></li>
+    <li><a href="#step6">Step 6 — Co-Applicant Score</a></li>
+    <li><a href="#step7">Step 7 — Rate &amp; EMI Compare</a></li>
+    <li><a href="#step10">Step 10 — Pass/Warn/Fail</a></li>
+    <li><a href="#step11">Step 11 — Fee &amp; Interest</a></li>
+  </ul>
+  <div class="section-label">Reference</div>
+  <ul>
+    <li><a href="#policy-thresholds">Policy Thresholds</a></li>
+    <li><a href="#hard-fails">Hard Fail Conditions</a></li>
+    <li><a href="#features">App Features</a></li>
+  </ul>
+</nav>
+
+<!-- Main Content -->
+<main>
+
+<h1 class="page-title" id="overview">Home Loan Eligibility Checker</h1>
+<p style="color:var(--muted);margin-bottom:24px;">Complete help manual — formulas, worked calculations, and policy reference</p>
+
+<div class="hero">
+  <p>
+    This tool guides you through <strong>11 steps</strong> to assess home loan eligibility against a published
+    policy framework. It produces a <strong>0–100 eligibility score</strong> across 7 weighted categories,
+    calculates live EMI and FOIR values, and maps the result to one of four outcomes:
+    <span class="badge badge-green">Eligible</span>
+    <span class="badge badge-blue">Eligible with Conditions</span>
+    <span class="badge badge-amber">Needs Review</span>
+    <span class="badge badge-red">Not Eligible</span>.
+    Every threshold is defined in a single policy file — no hidden rules.
+  </p>
+</div>
+
+<!-- ─── 11-STEP WORKFLOW ─────────────────────────────────────────────────── -->
+<h2 id="workflow">11-Step Workflow</h2>
+<table class="data-table">
+  <thead>
+    <tr><th>Step</th><th>Name</th><th>What it captures</th><th>Eligibility impact</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="highlight">1</td><td>Loan Requirement</td><td>Amount, tenure, purpose</td><td>LTV fit, tenure fit, hard-fail if &gt;₹10Cr or &gt;360mo</td></tr>
+    <tr><td class="highlight">2</td><td>Applicant Profile</td><td>DOB, employment type</td><td>Age fit, hard-fail if &lt;21, maturity age ceiling</td></tr>
+    <tr><td class="highlight">3</td><td>Property Details</td><td>Market/agreement value, own contribution</td><td>LTV band, max loan by LTV, effective property value</td></tr>
+    <tr><td class="highlight">4</td><td>Credit Profile</td><td>Credit score, existing loans, defaults</td><td>Credit fit (20 pts), hard-fail on wilful default</td></tr>
+    <tr><td class="highlight">5</td><td>Income &amp; FOIR</td><td>Net income, docs, stability</td><td>Income fit (15 pts), FOIR calculation, doc penalty</td></tr>
+    <tr><td class="highlight">6</td><td>Co-Applicant</td><td>Number, relationship, co-applicant income</td><td>Co-applicant fit (10 pts), added to FOIR income base</td></tr>
+    <tr><td class="highlight">7</td><td>Loan Preferences</td><td>Rate type: floating or fixed</td><td>Selects EMI estimation rate (8.75% float, 14% fixed)</td></tr>
+    <tr><td class="highlight">8</td><td>Documents Checklist</td><td>Which documents are ready</td><td>Informational — no scoring penalty here</td></tr>
+    <tr><td class="highlight">9</td><td>Declarations</td><td>Consents and confirmations</td><td>Informational — no scoring penalty here</td></tr>
+    <tr><td class="highlight">10</td><td>Review &amp; Score</td><td>Live assessment summary</td><td>Full 7-category breakdown, flags, computed values</td></tr>
+    <tr><td class="highlight">11</td><td>Final Decision</td><td>Outcome + next steps</td><td>Print/PDF export, rate range, recommended loan</td></tr>
+  </tbody>
+</table>
+
+<!-- ─── REFERENCE SCENARIO ──────────────────────────────────────────────── -->
+<h2 id="scenario">Reference Scenario — Harshavardhana T S</h2>
+<p>All worked examples in this manual use the following real data from the application. Every formula is shown with these values plugged in.</p>
+
+<div class="scenario-box">
+  <div class="scenario-title">Applicant Input Data</div>
+  <div class="scenario-grid">
+    <div class="scenario-item"><div class="s-label">Applicant Name</div><div class="s-val">Harshavardhana T S</div></div>
+    <div class="scenario-item"><div class="s-label">Loan Amount</div><div class="s-val">₹75,00,000</div></div>
+    <div class="scenario-item"><div class="s-label">Tenure</div><div class="s-val">20 months (1 yr 8 mo)</div></div>
+    <div class="scenario-item"><div class="s-label">Property Value</div><div class="s-val">₹1,00,00,000 (₹1 Cr)</div></div>
+    <div class="scenario-item"><div class="s-label">Employment Type</div><div class="s-val">Salaried</div></div>
+    <div class="scenario-item"><div class="s-label">Current Age</div><div class="s-val">35 years</div></div>
+    <div class="scenario-item"><div class="s-label">Net Monthly Income</div><div class="s-val">₹1,20,000</div></div>
+    <div class="scenario-item"><div class="s-label">Other Monthly Income</div><div class="s-val">₹0</div></div>
+    <div class="scenario-item"><div class="s-label">Existing EMIs</div><div class="s-val">₹10,000 / month</div></div>
+    <div class="scenario-item"><div class="s-label">Credit Score</div><div class="s-val">650</div></div>
+    <div class="scenario-item"><div class="s-label">Default History</div><div class="s-val">Minor</div></div>
+    <div class="scenario-item"><div class="s-label">Rate Type</div><div class="s-val">Floating → 8.75% p.a.</div></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     STEP-BY-STEP
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ─── STEP 1 ─────────────────────────────────────────────────────────── -->
+<h2 id="step1">Step 1 — Loan Requirement</h2>
+<div class="step-header">
+  <div class="step-number">1</div>
+  <div><h3>What does the lender need to fund?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Loan amount, tenure, purpose, and property type.</p></div>
+</div>
+
+<div class="field-grid">
+  <div class="field-item"><div class="field-label">Desired Loan Amount</div><div class="field-val">₹75,00,000</div><div class="field-hint">Min ₹1L · Max ₹10 Cr</div></div>
+  <div class="field-item"><div class="field-label">Loan Tenure</div><div class="field-val">20 months</div><div class="field-hint">12–360 months (1–30 years)</div></div>
+  <div class="field-item"><div class="field-label">Loan Purpose</div><div class="field-val">Purchase / Construction / etc.</div><div class="field-hint">Does not affect composite score</div></div>
+  <div class="field-item"><div class="field-label">Property Type</div><div class="field-val">Flat / Plot / Row house / etc.</div><div class="field-hint">Informs document checklist</div></div>
+</div>
+
+<h3>Formulas Triggered by Step 1 Inputs</h3>
+
+<h4>Loan Limit Validation</h4>
+<div class="formula-box">
+  <div class="formula-title">Hard-Fail Checks</div>
+  <div class="formula-main">
+    Hard Fail if:  Loan Amount = 0  OR  Loan Amount &gt; ₹10,00,00,000<br>
+    Hard Fail if:  Tenure (months) &gt; 360<br>
+    Minimum Loan:  ₹1,00,000  (warning only, not a hard fail)
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>₹10,00,00,000</dt><dd>= ₹10 crore = policy maximum sanctioned amount</dd></div>
+    <div class="var-row"><dt>360 months</dt><dd>= 30 years = policy maximum tenure</dd></div>
+  </div>
+</div>
+
+<h4>Amount Overage Formula (used in Amount Fit scoring)</h4>
+<div class="formula-box">
+  <div class="formula-title">Loan Amount vs LTV Ceiling</div>
+  <div class="formula-main">
+    Overage = Loan Amount − Max Loan<sub>LTV</sub><br><br>
+    if Overage &lt;= 0                       → Full score (1.00)<br>
+    if Overage / Max Loan<sub>LTV</sub> &lt;= 0.10  → Partial score (0.65)<br>
+    if Overage / Max Loan<sub>LTV</sub> &gt;  0.10  → Low score (0.20)
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Overage</dt><dd>= How much the requested loan exceeds the LTV-allowed maximum</dd></div>
+    <div class="var-row"><dt>Max Loan<sub>LTV</sub></dt><dd>= EPV × LTV Band % (computed in Step 3)</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Amount Overage Check</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Loan Amount: <span>₹75,00,000</span></div>
+    <div class="we-input-item">Max Loan by LTV: <span>₹75,00,000</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Overage =</span>₹75,00,000 − ₹75,00,000 = ₹0</div>
+    <div class="step-line"><span class="label">Overage &lt;= 0 →</span>Full score fraction = 1.00</div>
+  </div>
+  <div class="we-result">No overage — Amount Fit = 15 / 15</div>
+</div>
+
+<h4>Step 1 Hard-Fail Rules</h4>
+<table class="data-table">
+  <thead><tr><th>Condition</th><th>Outcome</th></tr></thead>
+  <tbody>
+    <tr><td>Loan Amount = 0 or not entered</td><td><span class="badge badge-red">Hard Fail</span></td></tr>
+    <tr><td>Loan Amount &gt; ₹10,00,00,000 (₹10 Cr)</td><td><span class="badge badge-red">Hard Fail</span></td></tr>
+    <tr><td>Tenure &gt; 360 months (30 years)</td><td><span class="badge badge-red">Hard Fail</span></td></tr>
+  </tbody>
+</table>
+
+<div class="info-card info">
+  <h4>Why tenure matters beyond Step 1</h4>
+  <p style="margin:0;font-size:13px;">Tenure feeds into the <strong>EMI formula</strong> (Step 5 display), the <strong>Age at Maturity check</strong>, and the <strong>Tenure Fit</strong> category score. A short 20-month tenure for a ₹75L loan causes a very high monthly EMI (₹4,04,371), which is the root cause of the 345.3% FOIR in this scenario.</p>
+</div>
+
+<hr>
+
+<!-- ─── STEP 2 ─────────────────────────────────────────────────────────── -->
+<h2 id="step2">Step 2 — Applicant Profile</h2>
+<div class="step-header">
+  <div class="step-number">2</div>
+  <div><h3>Who is the borrower?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Date of birth, employment type, and residential status.</p></div>
+</div>
+
+<div class="field-grid">
+  <div class="field-item"><div class="field-label">Date of Birth</div><div class="field-val">→ Age computed: 35 yrs</div><div class="field-hint">Derived to years at time of submission</div></div>
+  <div class="field-item"><div class="field-label">Employment Type</div><div class="field-val">Salaried</div><div class="field-hint">Governs FOIR limits and maturity age ceiling</div></div>
+  <div class="field-item"><div class="field-label">Residential Status</div><div class="field-val">Resident / NRI / OCI</div><div class="field-hint">Informational — NRI may require POA</div></div>
+</div>
+
+<h3>Formulas Triggered by Step 2 Inputs</h3>
+
+<h4>Age Calculation from Date of Birth</h4>
+<div class="formula-box">
+  <div class="formula-title">Current Age (derived from DOB)</div>
+  <div class="formula-main">
+    Age (years) = floor( (Today − Date of Birth) ÷ 365.25 )
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Today</dt><dd>= Date of application submission</dd></div>
+    <div class="var-row"><dt>Date of Birth</dt><dd>= As entered by applicant in DD/MM/YYYY format</dd></div>
+    <div class="var-row"><dt>÷ 365.25</dt><dd>= Accounts for leap years; result floored to whole years</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Age Calculation</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Date of Birth: <span>1991-05-01 (example)</span></div>
+    <div class="we-input-item">Application Date: <span>2026-05-17</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Days elapsed:</span>(2026-05-17) − (1991-05-01) = 12,olean days ≈ 12,800 days</div>
+    <div class="step-line"><span class="label">Age =</span>floor(12,800 ÷ 365.25) = floor(35.04) = 35 years</div>
+    <div class="step-line"><span class="label">Min age check:</span>35 &gt;= 21 → Pass (no hard fail)</div>
+  </div>
+  <div class="we-result">Age = 35 years — Hard fail threshold (age &lt; 21) not triggered</div>
+</div>
+
+<h4>Maturity Age Ceiling Selection</h4>
+<div class="formula-box">
+  <div class="formula-title">Typical Maturity Age (from Employment Type)</div>
+  <div class="formula-main">
+    if Employment Type = "salaried"        → Maturity Ceiling = 60 years<br>
+    if Employment Type = "self_employed"   → Maturity Ceiling = 65 years<br><br>
+    Grace Period = 3 years  (warn if age at maturity exceeds ceiling by up to 3 years)
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Ceiling Selection</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Employment Type: <span>Salaried</span></div>
+    <div class="we-input-item">Maturity Ceiling: <span>60 years</span></div>
+    <div class="we-input-item">Age at Maturity: <span>35 + 20/12 = 36.7 yrs</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Ceiling =</span>60 (salaried)</div>
+    <div class="step-line"><span class="label">Age at maturity 36.7 &lt;= 60 →</span>Tenure Fit = full score</div>
+    <div class="step-line"><span class="label">Recommended max tenure =</span>(60 − 35) × 12 = 300 months</div>
+  </div>
+  <div class="we-result">Maturity ceiling = 60 yrs — Applicant has up to 300 months of eligible tenure</div>
+</div>
+
+<h3>Age Fit Scoring (15 points)</h3>
+<table class="data-table">
+  <thead><tr><th>Age Range</th><th>Fraction</th><th>Points (max 15)</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>&lt; 21</td><td>—</td><td><span class="badge badge-red">Hard Fail</span></td><td>Below minimum age</td></tr>
+    <tr><td>21–30</td><td>0.90</td><td>14</td><td>Young — strong tenure flexibility</td></tr>
+    <tr><td class="highlight">31–45</td><td class="highlight">1.00</td><td class="highlight">15</td><td class="highlight">Prime range — optimal balance</td></tr>
+    <tr><td>46–55</td><td>0.75</td><td>11</td><td>Tenure constrained by retirement ceiling</td></tr>
+    <tr><td>&gt; 55</td><td>0.40</td><td>6</td><td>Significant tenure limitation</td></tr>
+  </tbody>
+</table>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Age Fit Score</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Applicant age: <span>35 years</span></div>
+    <div class="we-input-item">Age bracket: <span>31–45 (prime range)</span></div>
+    <div class="we-input-item">Score fraction: <span>1.00</span></div>
+    <div class="we-input-item">Max points: <span>15</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Age Score =</span>15 × 1.00 = 15</div>
+  </div>
+  <div class="we-result">Age Fit Score = 15 / 15 &nbsp;(Full score — prime age range)</div>
+</div>
+
+<h4>Typical Maturity Age by Employment Type</h4>
+<table class="data-table">
+  <thead><tr><th>Employment Type</th><th>Maturity Ceiling</th><th>Grace Period</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Salaried</td><td class="highlight">60 years</td><td>3 years (warn but not hard-fail)</td></tr>
+    <tr><td>Self-Employed</td><td>65 years</td><td>3 years (warn but not hard-fail)</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- ─── STEP 3 ─────────────────────────────────────────────────────────── -->
+<h2 id="step3">Step 3 — Property Details</h2>
+<div class="step-header">
+  <div class="step-number">3</div>
+  <div><h3>What is the property worth?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Market value, agreement (stamp duty) value, and planned own contribution.</p></div>
+</div>
+
+<div class="field-grid">
+  <div class="field-item"><div class="field-label">Market / Valuation Value</div><div class="field-val">₹1,00,00,000</div><div class="field-hint">Bank's independent valuation</div></div>
+  <div class="field-item"><div class="field-label">Agreement / Sale Price</div><div class="field-val">₹1,00,00,000</div><div class="field-hint">Registered sale deed value</div></div>
+  <div class="field-item"><div class="field-label">Use lower of the two?</div><div class="field-val">Toggle ON / OFF</div><div class="field-hint">RBI guidance: use lower for LTV base</div></div>
+  <div class="field-item"><div class="field-label">Own Contribution</div><div class="field-val">₹25,00,000</div><div class="field-hint">Down payment / applicant's own funds</div></div>
+</div>
+
+<!-- LTV section anchored here -->
+<h3 id="calc-ltv">LTV Calculation — Step-by-Step Derivation</h3>
+
+<h4>Step A — Effective Property Value (EPV)</h4>
+<div class="formula-box">
+  <div class="formula-title">Effective Property Value</div>
+  <div class="formula-main">
+    EPV = min(Market Value, Agreement Value)    if "use lower" toggle = ON<br>
+    EPV = Market Value                           if "use lower" toggle = OFF
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>EPV</dt><dd>= The property value used as the basis for all LTV calculations</dd></div>
+    <div class="var-row"><dt>Market Value</dt><dd>= Bank's independent valuation of the property</dd></div>
+    <div class="var-row"><dt>Agreement Value</dt><dd>= Registered sale deed / stamp duty value</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Effective Property Value</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Market Value: <span>₹1,00,00,000</span></div>
+    <div class="we-input-item">Agreement Value: <span>₹1,00,00,000</span></div>
+    <div class="we-input-item">"Use lower" toggle: <span>ON</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">EPV =</span>min(₹1,00,00,000, ₹1,00,00,000) = ₹1,00,00,000</div>
+  </div>
+  <div class="we-result">Effective Property Value (EPV) = ₹1,00,00,000 (₹1 Crore)</div>
+</div>
+
+<h4>Step B — LTV Band Lookup</h4>
+<div class="formula-box">
+  <div class="formula-title">LTV Band Rules (Policy — matches RBI guidelines)</div>
+  <div class="formula-main">
+    if EPV &lt;= ₹30,00,000   →  Band = 90%  (up to ₹27L loan for ₹30L property)<br>
+    if EPV &lt;= ₹75,00,000   →  Band = 80%  (up to ₹60L loan for ₹75L property)<br>
+    if EPV &gt;  ₹75,00,000   →  Band = 75%  (up to ₹75L loan for ₹1Cr property)
+  </div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Property Value (EPV)</th><th>Max LTV Ratio</th><th>Max LTV%</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Up to ₹30,00,000</td><td>0.90</td><td>90%</td><td>₹30L property → max loan ₹27L</td></tr>
+    <tr><td>₹30,00,001 to ₹75,00,000</td><td>0.80</td><td>80%</td><td>₹75L property → max loan ₹60L</td></tr>
+    <tr><td class="highlight">Above ₹75,00,000</td><td class="highlight">0.75</td><td class="highlight">75%</td><td class="highlight">₹1Cr property → max loan ₹75L</td></tr>
+  </tbody>
+</table>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — LTV Band Lookup</div>
+  <div class="we-inputs">
+    <div class="we-input-item">EPV: <span>₹1,00,00,000</span></div>
+    <div class="we-input-item">Is EPV &lt;= ₹30L? <span>No</span></div>
+    <div class="we-input-item">Is EPV &lt;= ₹75L? <span>No (₹1Cr &gt; ₹75L)</span></div>
+    <div class="we-input-item">Band applies: <span>Third band</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">EPV ₹1,00,00,000 &gt; ₹75,00,000 →</span>Third band applies</div>
+    <div class="step-line"><span class="label">Max LTV =</span>75% (0.75)</div>
+  </div>
+  <div class="we-result">LTV Band = 75%  (for properties above ₹75 lakhs per policy)</div>
+</div>
+
+<h4>Step C — Maximum Loan Amount by LTV</h4>
+<div class="formula-box">
+  <div class="formula-title">Maximum Loan by LTV</div>
+  <div class="formula-main">Max Loan<sub>LTV</sub> = EPV × LTV Band %</div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Max Loan<sub>LTV</sub></dt><dd>= Maximum amount the lender will fund, based on property value alone</dd></div>
+    <div class="var-row"><dt>EPV</dt><dd>= Effective Property Value (from Step A)</dd></div>
+    <div class="var-row"><dt>LTV Band %</dt><dd>= Maximum LTV ratio from Step B (e.g., 0.75)</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Max Loan by LTV</div>
+  <div class="we-inputs">
+    <div class="we-input-item">EPV: <span>₹1,00,00,000</span></div>
+    <div class="we-input-item">LTV Band: <span>75% = 0.75</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Max Loan =</span>₹1,00,00,000 × 0.75</div>
+    <div class="step-line"><span class="label">          =</span>₹75,00,000</div>
+  </div>
+  <div class="we-result">Maximum Loan by LTV = ₹75,00,000  (exactly matches the requested loan amount)</div>
+</div>
+
+<h4>Step D — Actual LTV Percentage</h4>
+<div class="formula-box">
+  <div class="formula-title">LTV Percentage</div>
+  <div class="formula-main">LTV% = (Loan Amount ÷ EPV) × 100</div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>LTV%</dt><dd>= Percentage of the property value being funded by the loan</dd></div>
+    <div class="var-row"><dt>Loan Amount</dt><dd>= Desired loan amount from Step 1</dd></div>
+    <div class="var-row"><dt>EPV</dt><dd>= Effective Property Value</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — LTV Percentage</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Loan Amount: <span>₹75,00,000</span></div>
+    <div class="we-input-item">EPV: <span>₹1,00,00,000</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">LTV% =</span>(₹75,00,000 ÷ ₹1,00,00,000) × 100</div>
+    <div class="step-line"><span class="label">      =</span>0.75 × 100</div>
+    <div class="step-line"><span class="label">      =</span>75.0%</div>
+    <div class="step-line"><span class="label">Compare to band limit:</span>75.0% &lt;= 75.0% → At limit (pass)</div>
+  </div>
+  <div class="we-result">LTV% = 75.0%  (exactly at the band maximum — passes LTV check)</div>
+</div>
+
+<h4>Step E — Down Payment Adequacy Check</h4>
+<div class="formula-box">
+  <div class="formula-title">Implied Loan from Own Contribution</div>
+  <div class="formula-main">
+    Implied Loan = EPV − Own Contribution<br><br>
+    if Own Contribution &gt; 0  AND  Implied Loan &gt; Max Loan<sub>LTV</sub><br>
+    → Info flag: "Own contribution implies loan of ₹X — verify against requested amount"
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Implied Loan</dt><dd>= What the applicant needs to borrow if they use their stated contribution</dd></div>
+    <div class="var-row"><dt>Own Contribution</dt><dd>= Down payment / own funds from Step 3</dd></div>
+    <div class="var-row"><dt>Max Loan<sub>LTV</sub></dt><dd>= EPV × LTV Band (the lender's hard ceiling)</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Down Payment Check</div>
+  <div class="we-inputs">
+    <div class="we-input-item">EPV: <span>₹1,00,00,000</span></div>
+    <div class="we-input-item">Own Contribution: <span>₹25,00,000</span></div>
+    <div class="we-input-item">Max Loan by LTV: <span>₹75,00,000</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Implied Loan =</span>₹1,00,00,000 − ₹25,00,000 = ₹75,00,000</div>
+    <div class="step-line"><span class="label">Implied Loan vs Max LTV Loan:</span>₹75,00,000 &lt;= ₹75,00,000 → No flag</div>
+    <div class="step-line"><span class="label">Minimum own contribution needed:</span>EPV − Max LTV Loan = ₹1,00,00,000 − ₹75,00,000 = ₹25,00,000</div>
+  </div>
+  <div class="we-result">Down payment of ₹25,00,000 is exactly the minimum required (25% of ₹1 Crore)</div>
+</div>
+
+<h3>LTV Fit Scoring (15 points)</h3>
+<table class="data-table">
+  <thead><tr><th>LTV% vs Band Limit</th><th>Score Fraction</th><th>Points (max 15)</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">LTV &lt;= Band limit (75.0% &lt;= 75%)</td><td class="highlight">1.00</td><td class="highlight">15</td></tr>
+    <tr><td>LTV within +5% of band limit</td><td>0.50</td><td>8</td></tr>
+    <tr><td>LTV more than +5% above limit</td><td>0.00</td><td>0</td></tr>
+  </tbody>
+</table>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — LTV Fit Score</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Actual LTV%: <span>75.0%</span></div>
+    <div class="we-input-item">Band Limit: <span>75%</span></div>
+    <div class="we-input-item">Difference: <span>0% (at limit)</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">LTV 75% &lt;= Band 75% →</span>Full score fraction = 1.00</div>
+    <div class="step-line"><span class="label">LTV Fit Score =</span>15 × 1.00 = 15</div>
+  </div>
+  <div class="we-result">LTV Fit Score = 15 / 15</div>
+</div>
+
+<hr>
+
+<!-- ─── STEP 4 ─────────────────────────────────────────────────────────── -->
+<h2 id="step4">Step 4 — Credit Profile</h2>
+<div class="step-header">
+  <div class="step-number">4</div>
+  <div><h3>What is the applicant's credit history?</h3><p style="margin:0;color:var(--muted);font-size:13px;">CIBIL/bureau score, existing loan EMIs, default history, and repayment behaviour.</p></div>
+</div>
+
+<div class="field-grid">
+  <div class="field-item"><div class="field-label">Credit Score (CIBIL)</div><div class="field-val">650</div><div class="field-hint">Range: 300–900</div></div>
+  <div class="field-item"><div class="field-label">Repayment History</div><div class="field-val">Good / Fair / Poor</div><div class="field-hint">Self-declared; bureau verifies</div></div>
+  <div class="field-item"><div class="field-label">Default Severity</div><div class="field-val">Minor (in example)</div><div class="field-hint">None / Minor / Major / Wilful</div></div>
+  <div class="field-item"><div class="field-label">Existing Loan EMIs</div><div class="field-val">₹10,000 / month</div><div class="field-hint">All active loan repayments combined</div></div>
+</div>
+
+<h3>Formulas Triggered by Step 4 Inputs</h3>
+
+<h4>Existing EMIs Total (feeds FOIR in Step 5)</h4>
+<div class="formula-box">
+  <div class="formula-title">Total Existing Monthly Obligations</div>
+  <div class="formula-main">
+    Existing EMIs = Σ (EMI<sub>1</sub> + EMI<sub>2</sub> + … + EMI<sub>n</sub>)<br><br>
+    where each EMI<sub>i</sub> is the monthly repayment of an active loan
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Σ</dt><dd>= Summation across all loans listed in Step 4</dd></div>
+    <div class="var-row"><dt>EMI<sub>i</sub></dt><dd>= Monthly instalment for the i-th existing loan</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Existing EMIs Total</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Car Loan EMI: <span>₹8,000</span></div>
+    <div class="we-input-item">Personal Loan EMI: <span>₹2,000</span></div>
+    <div class="we-input-item">Other Loans: <span>₹0</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Existing EMIs =</span>₹8,000 + ₹2,000 = ₹10,000</div>
+    <div class="step-line"><span class="label">This flows into FOIR as:</span>FOIR numerator = ₹10,000 + New EMI (₹4,04,371)</div>
+  </div>
+  <div class="we-result">Total Existing EMIs = ₹10,000 / month</div>
+</div>
+
+<h3>Credit Fit Scoring (20 points) — Full Logic</h3>
+
+<p>Credit scoring applies three independent modifiers in sequence:</p>
+
+<h4>Modifier 1 — Credit Score Band (base score)</h4>
+<table class="data-table">
+  <thead><tr><th>CIBIL Score</th><th>Fraction</th><th>Base Points</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>750 and above</td><td>1.00</td><td>20</td><td><span class="badge badge-green">Strong</span></td></tr>
+    <tr><td>700–749</td><td>0.75</td><td>15</td><td><span class="badge badge-blue">Acceptable</span></td></tr>
+    <tr><td class="highlight">650–699</td><td class="highlight">0.45</td><td class="highlight">9</td><td><span class="badge badge-amber">Needs Review</span></td></tr>
+    <tr><td>550–649</td><td>0.20</td><td>4</td><td><span class="badge badge-red">Low</span></td></tr>
+    <tr><td>Below 550</td><td>0.00</td><td>0</td><td><span class="badge badge-red">Very Low</span></td></tr>
+    <tr><td>Wilful Default</td><td>—</td><td><span class="badge badge-red">Hard Fail</span></td><td>Application stopped</td></tr>
+    <tr><td>Major Default</td><td>0.10</td><td>2</td><td><span class="badge badge-red">High Risk</span></td></tr>
+  </tbody>
+</table>
+
+<h4>Modifier 2 — Repayment History (applied to base score)</h4>
+<table class="data-table">
+  <thead><tr><th>Repayment History</th><th>Multiplier</th><th>Effect on 9-point base</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Good</td><td class="highlight">× 1.00</td><td class="highlight">9 × 1.00 = 9</td></tr>
+    <tr><td>Fair</td><td>× 0.85</td><td>9 × 0.85 = 7.65 → 8</td></tr>
+    <tr><td>Poor</td><td>× 0.70</td><td>9 × 0.70 = 6.3 → 6</td></tr>
+  </tbody>
+</table>
+
+<h4>Modifier 3 — Default Severity (applied after repayment modifier)</h4>
+<table class="data-table">
+  <thead><tr><th>Default Severity</th><th>Multiplier</th><th>Effect on score of 9</th></tr></thead>
+  <tbody>
+    <tr><td>None</td><td>× 1.00</td><td>9 unchanged</td></tr>
+    <tr><td class="highlight">Minor</td><td class="highlight">× 0.85</td><td class="highlight">9 × 0.85 = 7.65 → rounded = 8</td></tr>
+    <tr><td>Major</td><td>Score hard-capped to 2</td><td>max(score, 2)</td></tr>
+    <tr><td>Wilful</td><td>Hard Fail</td><td>Application blocked entirely</td></tr>
+  </tbody>
+</table>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Credit Fit Score (Harshavardhana T S)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Credit Score: <span>650</span></div>
+    <div class="we-input-item">Repayment History: <span>Good</span></div>
+    <div class="we-input-item">Default Severity: <span>Minor</span></div>
+    <div class="we-input-item">Max Credit Points: <span>20</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Step 1 — Band:</span>650 falls in [650, 699] → fraction = 0.45</div>
+    <div class="step-line"><span class="label">Step 2 — Base score:</span>20 × 0.45 = 9.0 → rounded = 9</div>
+    <div class="step-line"><span class="label">Step 3 — Repayment modifier:</span>History = "Good" → multiplier = 1.00</div>
+    <div class="step-line"><span class="label">             After modifier:</span>9 × 1.00 = 9</div>
+    <div class="step-line"><span class="label">Step 4 — Minor default modifier:</span>Severity = "Minor" → multiplier = 0.85</div>
+    <div class="step-line"><span class="label">             Final credit score:</span>9 × 0.85 = 7.65 → rounded = 8</div>
+  </div>
+  <div class="we-result">Credit Fit Score = 8 / 20</div>
+</div>
+
+<hr>
+
+<!-- ─── STEP 5 ─────────────────────────────────────────────────────────── -->
+<h2 id="step5">Step 5 — Income &amp; FOIR</h2>
+<div class="step-header">
+  <div class="step-number">5</div>
+  <div><h3>Can the applicant repay?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Monthly income, employment stability, and income document availability.</p></div>
+</div>
+
+<div class="field-grid">
+  <div class="field-item"><div class="field-label">Net Monthly Income</div><div class="field-val">₹1,20,000</div><div class="field-hint">Take-home / in-hand amount</div></div>
+  <div class="field-item"><div class="field-label">Other Monthly Income</div><div class="field-val">₹0</div><div class="field-hint">Rental, freelance, side income</div></div>
+  <div class="field-item"><div class="field-label">Employment Stability</div><div class="field-val">Years in current role</div><div class="field-hint">&lt;1 yr = 15% score penalty · &lt;2 yr = info flag</div></div>
+  <div class="field-item"><div class="field-label">Income Documents</div><div class="field-val">Salary slips / ITR / Statements</div><div class="field-hint">Missing any = 15% income score penalty</div></div>
+</div>
+
+<h3 id="calc-emi">EMI Formula — Equated Monthly Instalment</h3>
+
+<div class="formula-box">
+  <div class="formula-title">EMI Formula (Reducing Balance Method)</div>
+  <div class="formula-main">
+         P  ×  r  ×  (1 + r)<sup>n</sup><br>
+EMI  =  ──────────────────────<br>
+              (1 + r)<sup>n</sup>  −  1
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>EMI</dt><dd>= Monthly Equated Instalment in ₹</dd></div>
+    <div class="var-row"><dt>P</dt><dd>= Principal (Loan Amount in ₹)</dd></div>
+    <div class="var-row"><dt>r</dt><dd>= Monthly interest rate = Annual Rate % ÷ 12 ÷ 100</dd></div>
+    <div class="var-row"><dt>n</dt><dd>= Loan tenure in months</dd></div>
+    <div class="var-row"><dt>(1+r)^n</dt><dd>= Compound growth factor over n months</dd></div>
+  </div>
+</div>
+
+<h4>Which rate is used for EMI estimation?</h4>
+<table class="data-table">
+  <thead><tr><th>Rate Type (from Step 7)</th><th>Rate Used for EMI Estimate</th><th>Actual Floating Range</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Floating (default)</td><td class="highlight">8.75% p.a. (fixed mid-point)</td><td>8.00%–9.15% (credit-risk based)</td></tr>
+    <tr><td>Fixed</td><td>14.00% p.a.</td><td>~14.00%</td></tr>
+  </tbody>
+</table>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — EMI Calculation (Harshavardhana T S)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Principal (P): <span>₹75,00,000</span></div>
+    <div class="we-input-item">Annual Rate: <span>8.75%</span></div>
+    <div class="we-input-item">Tenure (n): <span>20 months</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Step 1 — Monthly rate (r):</span>r = 8.75 ÷ 12 ÷ 100 = 0.00729167</div>
+    <div class="step-line"><span class="label">Step 2 — Compound factor:</span>(1 + r)^n = (1.00729167)^20</div>
+    <div class="step-line"><span class="label">                        =</span>1.15637  (calculated via logarithms)</div>
+    <div class="step-line"><span class="label">Step 3 — Numerator:</span>P × r × (1+r)^n = 75,00,000 × 0.00729167 × 1.15637</div>
+    <div class="step-line"><span class="label">                   =</span>75,00,000 × 0.008435 = 63,262</div>
+    <div class="step-line"><span class="label">Step 4 — Denominator:</span>(1+r)^n − 1 = 1.15637 − 1.00000 = 0.15637</div>
+    <div class="step-line"><span class="label">Step 5 — EMI:</span>63,262 ÷ 0.15637 = 4,04,371</div>
+  </div>
+  <div class="we-result">Estimated New EMI = ₹4,04,371 per month</div>
+</div>
+
+<div class="info-card warning">
+  <h4>Why is the EMI so high with a 20-month tenure?</h4>
+  <p style="margin:0;font-size:13px;">The EMI has two components: principal repayment + interest. Over only 20 months, principal repayment alone is ₹75,00,000 ÷ 20 = ₹3,75,000/month. Interest adds ~₹29,000/month on top, giving ₹4,04,371. Compare to 30-year tenure where EMI ≈ ₹59,000 — because principal is spread over 360 months.</p>
+</div>
+
+<h4>EMI Sensitivity — Tenure Effect on Same ₹75L Loan</h4>
+<table class="data-table">
+  <thead><tr><th>Tenure</th><th>n (months)</th><th>EMI at 8.75%</th><th>FOIR on ₹1.2L income</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">20 months (example)</td><td class="highlight">20</td><td class="highlight">₹4,04,371</td><td class="highlight" style="color:var(--red)">345.3%</td></tr>
+    <tr><td>5 years</td><td>60</td><td>₹1,55,432</td><td style="color:var(--red)">137.9%</td></tr>
+    <tr><td>10 years</td><td>120</td><td>₹93,579</td><td style="color:var(--red)">86.3%</td></tr>
+    <tr><td>20 years</td><td>240</td><td>₹65,934</td><td style="color:var(--amber)">63.3%</td></tr>
+    <tr><td>25 years</td><td>300</td><td>₹61,694</td><td style="color:var(--green)">59.7%</td></tr>
+    <tr><td>30 years</td><td>360</td><td>₹59,131</td><td style="color:var(--green)">57.6%</td></tr>
+  </tbody>
+</table>
+
+<h3>Employment Stability Penalty</h3>
+<div class="formula-box">
+  <div class="formula-title">Stability-Based Score Modifier</div>
+  <div class="formula-main">
+    if stability_years &lt; 1   → Income Score × 0.85  + warning flag<br>
+    if stability_years &lt; 2   → No score penalty, but info flag raised<br>
+    if stability_years &gt;= 2  → No penalty
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>stability_years</dt><dd>= Years in current employment / business as entered by applicant</dd></div>
+  </div>
+</div>
+
+<h3>Maximum Loan by Repayment Capacity (Reverse EMI)</h3>
+<div class="formula-box">
+  <div class="formula-title">Max Affordable Loan — Reverse EMI Formula</div>
+  <div class="formula-main">
+    Max EMI Allowed = Total Income × FOIR<sub>max</sub> − Existing EMIs<br><br>
+               Max EMI × ( (1+r)<sup>n</sup> − 1 )<br>
+    Max Loan = ────────────────────────────<br>
+                    r × (1+r)<sup>n</sup>
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>FOIR<sub>max</sub></dt><dd>= 0.60 for salaried / 0.65 for self-employed</dd></div>
+    <div class="var-row"><dt>Max EMI Allowed</dt><dd>= The highest EMI the applicant can afford before hitting the FOIR ceiling</dd></div>
+    <div class="var-row"><dt>r</dt><dd>= Monthly interest rate (Annual Rate ÷ 12 ÷ 100)</dd></div>
+    <div class="var-row"><dt>n</dt><dd>= Tenure in months</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Max Loan by Repayment Capacity (Harshavardhana T S)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Total Income: <span>₹1,20,000</span></div>
+    <div class="we-input-item">FOIR max (salaried): <span>60% = 0.60</span></div>
+    <div class="we-input-item">Existing EMIs: <span>₹10,000</span></div>
+    <div class="we-input-item">Rate: <span>8.75% p.a.</span></div>
+    <div class="we-input-item">Tenure: <span>20 months</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Step 1 — Max EMI allowed:</span>₹1,20,000 × 0.60 − ₹10,000 = ₹72,000 − ₹10,000 = ₹62,000</div>
+    <div class="step-line"><span class="label">Step 2 — r:</span>8.75 ÷ 12 ÷ 100 = 0.007292</div>
+    <div class="step-line"><span class="label">Step 3 — (1+r)^n:</span>(1.007292)^20 = 1.15637</div>
+    <div class="step-line"><span class="label">Step 4 — Max Loan:</span>62,000 × (1.15637 − 1) ÷ (0.007292 × 1.15637)</div>
+    <div class="step-line"><span class="label">                =</span>62,000 × 0.15637 ÷ 0.008435</div>
+    <div class="step-line"><span class="label">                =</span>9,695 ÷ 0.008435 = ₹11,49,970</div>
+  </div>
+  <div class="we-result">Max affordable loan at 20-month tenure = ₹11,49,970 (vs requested ₹75,00,000 — 6.5× too high)</div>
+</div>
+
+<div class="info-card info">
+  <p style="margin:0;font-size:13px;">This reverse calculation shows <em>what loan the applicant can actually afford</em>. At 20-month tenure the income allows only ₹11.5L, but at 25-year tenure the same income supports ₹73L — within reach of the requested ₹75L.</p>
+</div>
+
+<h3 id="calc-foir">FOIR — Fixed Obligations to Income Ratio</h3>
+
+<div class="formula-box">
+  <div class="formula-title">FOIR Formula</div>
+  <div class="formula-main">
+                  Existing EMIs  +  New EMI (estimated)<br>
+FOIR (ratio) =  ─────────────────────────────────────────<br>
+                         Total Monthly Income<br><br>
+FOIR % = FOIR ratio × 100
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Existing EMIs</dt><dd>= Sum of all active loan repayments entered in Step 4</dd></div>
+    <div class="var-row"><dt>New EMI</dt><dd>= Estimated EMI for the requested loan (calculated above)</dd></div>
+    <div class="var-row"><dt>Total Monthly Income</dt><dd>= Net Income (Step 5) + Other Income (Step 5) + Co-Applicant Income (Step 6)</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — FOIR Calculation (Harshavardhana T S)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Net Income (Step 5): <span>₹1,20,000</span></div>
+    <div class="we-input-item">Other Income (Step 5): <span>₹0</span></div>
+    <div class="we-input-item">Co-Applicant Income (Step 6): <span>₹0</span></div>
+    <div class="we-input-item">Total Monthly Income: <span>₹1,20,000</span></div>
+    <div class="we-input-item">Existing EMIs (Step 4): <span>₹10,000</span></div>
+    <div class="we-input-item">New EMI (estimated): <span>₹4,04,371</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Step 1 — Total obligations:</span>₹10,000 + ₹4,04,371 = ₹4,14,371</div>
+    <div class="step-line"><span class="label">Step 2 — FOIR ratio:</span>₹4,14,371 ÷ ₹1,20,000 = 3.4531</div>
+    <div class="step-line"><span class="label">Step 3 — FOIR percent:</span>3.4531 × 100 = 345.3%</div>
+    <div class="step-line"><span class="label">Step 4 — Compare to limit:</span>345.3% vs max 60% (salaried) → Far exceeds</div>
+  </div>
+  <div class="we-result">FOIR = 345.3%  (max threshold for salaried = 60%)</div>
+</div>
+
+<h4>FOIR Thresholds by Employment Type</h4>
+<table class="data-table">
+  <thead><tr><th>Employment</th><th>Ideal (&lt;= this = full score)</th><th>Acceptable</th><th>Maximum</th><th>Above Max</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Salaried</td><td class="highlight">&lt;= 40%</td><td class="highlight">41%–50%</td><td class="highlight">51%–60%</td><td><span class="badge badge-red">Exceeds Policy</span></td></tr>
+    <tr><td>Self-Employed</td><td>&lt;= 40%</td><td>41%–55%</td><td>56%–65%</td><td><span class="badge badge-red">Exceeds Policy</span></td></tr>
+  </tbody>
+</table>
+
+<h4>Income Fit Scoring (15 points)</h4>
+<table class="data-table">
+  <thead><tr><th>FOIR Result</th><th>Score Fraction</th><th>Points (max 15)</th></tr></thead>
+  <tbody>
+    <tr><td>&lt;= 40% (ideal)</td><td>1.00</td><td>15</td></tr>
+    <tr><td>&lt;= 50% salaried / 55% SE (acceptable)</td><td>0.80</td><td>12</td></tr>
+    <tr><td>&lt;= 60% salaried / 65% SE (maximum)</td><td>0.55</td><td>8</td></tr>
+    <tr><td class="highlight">&gt; 60% salaried / 65% SE (exceeded)</td><td class="highlight">0.15</td><td class="highlight">2</td></tr>
+  </tbody>
+</table>
+
+<p>If any required income document is missing (salary slips / ITR / bank statements), a further <strong>15% penalty</strong> is applied:</p>
+<div class="formula-box">
+  <div class="formula-title">Document Penalty on Income Score</div>
+  <div class="formula-main">Income Score (final) = Income Score (FOIR-based) × 0.85   if any required doc is missing</div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Income Fit Score</div>
+  <div class="we-inputs">
+    <div class="we-input-item">FOIR: <span>345.3%</span></div>
+    <div class="we-input-item">Max threshold: <span>60% (salaried)</span></div>
+    <div class="we-input-item">Missing docs: <span>Yes (e.g., salary slips missing)</span></div>
+    <div class="we-input-item">Max income points: <span>15</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Step 1 — FOIR band:</span>345.3% &gt; 60% → fraction = 0.15</div>
+    <div class="step-line"><span class="label">Step 2 — Base score:</span>15 × 0.15 = 2.25 → rounded = 2</div>
+    <div class="step-line"><span class="label">Step 3 — Doc penalty:</span>Missing docs → 2 × 0.85 = 1.70 → rounded = 2</div>
+  </div>
+  <div class="we-result">Income Fit Score = 2 / 15</div>
+</div>
+
+<hr>
+
+<!-- ─── STEP 6 ─────────────────────────────────────────────────────────── -->
+<h2 id="step6">Step 6 — Co-Applicant</h2>
+<div class="step-header">
+  <div class="step-number">6</div>
+  <div><h3>Who else is on the loan?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Co-applicants strengthen the income base and satisfy the "all owners must co-borrow" rule.</p></div>
+</div>
+
+<div class="field-grid">
+  <div class="field-item"><div class="field-label">Number of Co-Applicants</div><div class="field-val">0, 1, or 2+</div><div class="field-hint">0 = warning (policy mandates co-applicant)</div></div>
+  <div class="field-item"><div class="field-label">Relationship</div><div class="field-val">Spouse / Parent / Son-Daughter / Sibling / Other</div><div class="field-hint">"Other" → info flag (may not be accepted)</div></div>
+  <div class="field-item"><div class="field-label">Co-Applicant Monthly Income</div><div class="field-val">₹X</div><div class="field-hint">Added to total income used in FOIR</div></div>
+  <div class="field-item"><div class="field-label">All Property Owners Included?</div><div class="field-val">Yes / No</div><div class="field-hint">All owners must be co-borrowers per policy</div></div>
+</div>
+
+<h4>Co-Applicant Income and FOIR</h4>
+<div class="formula-box">
+  <div class="formula-title">Total Income including Co-Applicant</div>
+  <div class="formula-main">
+    Total Income = Net Income (Step 5) + Other Income (Step 5) + Co-Applicant Income (Step 6)<br><br>
+    FOIR = (Existing EMIs + New EMI) ÷ Total Income
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Illustration — How co-applicant income reduces FOIR</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Base FOIR: <span>345.3% (no co-applicant income)</span></div>
+    <div class="we-input-item">Total obligations: <span>₹4,14,371</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Scenario A — Add ₹3,00,000 co-applicant income:</span></div>
+    <div class="step-line"><span class="label">  Total Income:</span>₹1,20,000 + ₹3,00,000 = ₹4,20,000</div>
+    <div class="step-line"><span class="label">  FOIR:</span>₹4,14,371 ÷ ₹4,20,000 = 98.7%  (still above 60%)</div>
+    <div class="step-line"><span class="label">Scenario B — Extend tenure to 240 months (20 years):</span></div>
+    <div class="step-line"><span class="label">  New EMI at 8.75% 240mo:</span>≈ ₹65,900</div>
+    <div class="step-line"><span class="label">  FOIR:</span>(₹10,000 + ₹65,900) ÷ ₹1,20,000 = 63.3%  (near acceptable)</div>
+  </div>
+  <div class="we-result">Tenure extension is far more effective than co-applicant income for fixing FOIR in this scenario.</div>
+</div>
+
+<h4>Co-Applicant Fit Scoring Formula (10 points)</h4>
+<div class="formula-box">
+  <div class="formula-title">Co-Applicant Fit Score Derivation</div>
+  <div class="formula-main">
+    if numberOfCoApplicants = 0:<br>
+        coScore = 10 × 0.50 = 5  +  warning flag<br><br>
+    if numberOfCoApplicants &gt;= 1:<br>
+        coScore = 10  (full score)<br><br>
+        if relationship = "other":<br>
+            coScore = 10 × 0.70 = 7  +  info flag<br><br>
+        if NOT allOwnersIncluded AND numberOfPropertyOwners &gt; 1:<br>
+            coScore = coScore × 0.70  +  warning flag
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>0.50</dt><dd>= 50% score when no co-applicant (policy says co-applicant is generally mandatory)</dd></div>
+    <div class="var-row"><dt>0.70</dt><dd>= 70% score when relationship is "Other" (not in accepted list)</dd></div>
+    <div class="var-row"><dt>allOwnersIncluded</dt><dd>= Boolean — whether all property owners are listed as co-borrowers</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Co-Applicant Fit Score (Harshavardhana T S)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Co-applicants: <span>1 (spouse)</span></div>
+    <div class="we-input-item">Relationship: <span>Spouse (accepted)</span></div>
+    <div class="we-input-item">All owners included: <span>Yes</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Step 1:</span>Number of co-applicants &gt;= 1 → base coScore = 10</div>
+    <div class="step-line"><span class="label">Step 2:</span>Relationship "spouse" is in accepted list → no penalty</div>
+    <div class="step-line"><span class="label">Step 3:</span>allOwnersIncluded = true → no penalty</div>
+    <div class="step-line"><span class="label">Final score:</span>10</div>
+  </div>
+  <div class="we-result">Co-Applicant Fit Score = 10 / 10</div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Condition</th><th>Score</th><th>Flags</th></tr></thead>
+  <tbody>
+    <tr><td>No co-applicant</td><td>5 (50%)</td><td>Warning: co-applicant generally mandatory</td></tr>
+    <tr><td class="highlight">Co-applicant present, accepted relationship (spouse/parent/sibling/child)</td><td class="highlight">10 (100%)</td><td class="highlight">None</td></tr>
+    <tr><td>Co-applicant present, "Other" relationship</td><td>7 (70%)</td><td>Info: relationship may not be accepted</td></tr>
+    <tr><td>Not all property owners included as co-applicants</td><td>Score × 0.70</td><td>Warning: alignment required</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- ─── STEP 7 ─────────────────────────────────────────────────────────── -->
+<h2 id="step7">Step 7 — Loan Preferences</h2>
+<div class="step-header">
+  <div class="step-number">7</div>
+  <div><h3>How should the loan be structured?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Rate type selection — directly determines the EMI estimation rate used in scoring.</p></div>
+</div>
+
+<h3>Formulas Triggered by Step 7 Inputs</h3>
+
+<h4>Rate Selection Formula</h4>
+<div class="formula-box">
+  <div class="formula-title">EMI Estimation Rate Selection</div>
+  <div class="formula-main">
+    if rateType = "floating"  →  estimateRate = 8.75%  (policy mid-point)<br>
+    if rateType = "fixed"     →  estimateRate = 14.00%
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>estimateRate</dt><dd>= Annual rate used in EMI formula for scoring purposes</dd></div>
+    <div class="var-row"><dt>8.75%</dt><dd>= Mid-point of floating range (8.00%–9.15%) to give a neutral FOIR estimate</dd></div>
+    <div class="var-row"><dt>14.00%</dt><dd>= Fixed rate (substantially higher — reflects certainty premium)</dd></div>
+  </div>
+</div>
+
+<h4>Displayed Rate Range Adjustment (credit score dependent)</h4>
+<div class="formula-box">
+  <div class="formula-title">Interest Rate Range Shown on Step 11</div>
+  <div class="formula-main">
+    if rateType = "fixed":<br>
+        rateMin = rateMax = 14.00%<br><br>
+    if rateType = "floating" AND credit_score &gt;= 750 (strong):<br>
+        rateMin = 8.00%,  rateMax = 8.00% + 0.50% = 8.50%<br><br>
+    if rateType = "floating" AND credit_score &lt; 750:<br>
+        rateMin = 8.00%,  rateMax = 9.15%
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>0.50%</dt><dd>= Narrow band applied when credit is strong (premium pricing)</dd></div>
+  </div>
+</div>
+
+<h4>EMI Comparison — Floating vs Fixed at Same Parameters</h4>
+<div class="worked-example">
+  <div class="we-title">Worked Example — Floating vs Fixed EMI (₹75L, 20 months)</div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Floating (8.75%):</span>EMI = ₹4,04,371 → FOIR = 345.3%</div>
+    <div class="step-line"><span class="label">Fixed (14.00%):</span>r = 14 ÷ 12 ÷ 100 = 0.011667</div>
+    <div class="step-line"><span class="label">                 </span>(1+r)^20 = (1.011667)^20 = 1.2594</div>
+    <div class="step-line"><span class="label">                 </span>EMI = 75,00,000 × 0.011667 × 1.2594 ÷ (1.2594 − 1)</div>
+    <div class="step-line"><span class="label">                 </span>= 75,00,000 × 0.014693 ÷ 0.2594 = ₹4,25,127</div>
+    <div class="step-line"><span class="label">Fixed FOIR:</span>(₹10,000 + ₹4,25,127) ÷ ₹1,20,000 = 362.6%</div>
+  </div>
+  <div class="we-result">Fixed rate raises EMI by ₹20,756/mo (to ₹4,25,127) — FOIR worsens to 362.6% vs 345.3% floating</div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Rate Type</th><th>Estimation Rate</th><th>Actual Rate Range</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="highlight">Floating (chosen in example)</td>
+      <td class="highlight">8.75% p.a.</td>
+      <td>8.00%–9.15% p.a.</td>
+      <td>Risk-based; resets with RBI repo rate. Credit score &gt;= 750 gets lower end.</td>
+    </tr>
+    <tr>
+      <td>Fixed</td>
+      <td>14.00% p.a.</td>
+      <td>~14.00% p.a.</td>
+      <td>Certainty of payment; higher cost vs floating.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="info-card info">
+  <p style="margin:0;font-size:13px;"><strong>Rate range on Final Decision (Step 11):</strong> If credit score &gt;= 750, the displayed rate range narrows to 8.00%–8.50%. Otherwise the full 8.00%–9.15% range applies. This is indicative only — the actual rate is set by the lender at sanction.</p>
+</div>
+
+<hr>
+
+<!-- ─── STEP 8 ─────────────────────────────────────────────────────────── -->
+<h2 id="step8">Step 8 — Documents Checklist</h2>
+<div class="step-header">
+  <div class="step-number">8</div>
+  <div><h3>What documents are ready?</h3><p style="margin:0;color:var(--muted);font-size:13px;">Informational step. Document completeness noted here does not re-score; scoring is based on Step 5 checkboxes.</p></div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Document</th><th>Salaried</th><th>Self-Employed</th><th>When needed</th></tr></thead>
+  <tbody>
+    <tr><td>Salary Slips (3 months)</td><td class="highlight">Required</td><td>Not required</td><td>Proof of monthly income</td></tr>
+    <tr><td>Income Tax Returns (2 years)</td><td class="highlight">Required</td><td class="highlight">Required</td><td>Income history and tax compliance</td></tr>
+    <tr><td>Bank Statements (6 months)</td><td class="highlight">Required</td><td class="highlight">Required</td><td>Cash flow and EMI outflows</td></tr>
+    <tr><td>Form 16</td><td>Preferred</td><td>N/A</td><td>TDS certificate from employer</td></tr>
+    <tr><td>GST Returns</td><td>Not required</td><td class="highlight">Required</td><td>Turnover proof for business</td></tr>
+    <tr><td>Audited Financials</td><td>Not required</td><td class="highlight">Required</td><td>Profit/loss for business applicants</td></tr>
+    <tr><td>Property Documents</td><td colspan="2">Required for all</td><td>Title deed, approvals, NOC, etc.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- ─── STEP 9 ─────────────────────────────────────────────────────────── -->
+<h2 id="step9">Step 9 — Declarations</h2>
+<div class="step-header">
+  <div class="step-number">9</div>
+  <div><h3>Applicant consents and confirmations</h3><p style="margin:0;color:var(--muted);font-size:13px;">Informational step — no scoring impact. Required before a formal lender application.</p></div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Declaration</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>CIBIL / Bureau check consent</td><td>Lender needs authorisation to pull the credit report</td></tr>
+    <tr><td>Information accuracy declaration</td><td>Applicant certifies all data is true and complete</td></tr>
+    <tr><td>Power of attorney (if applicable)</td><td>Required for NRI/OCI applicants signing remotely</td></tr>
+    <tr><td>Insurance intent</td><td>Home/life insurance preference — informational</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- ─── STEP 10 ─────────────────────────────────────────────────────────── -->
+<h2 id="step10">Step 10 — Review &amp; Score</h2>
+<div class="step-header">
+  <div class="step-number">10</div>
+  <div><h3>Full eligibility assessment</h3><p style="margin:0;color:var(--muted);font-size:13px;">Score ring, 7-category breakdown with bars, flag list, and key computed values.</p></div>
+</div>
+
+<h3>7-Category Scoring Weights</h3>
+<table class="data-table">
+  <thead><tr><th>Category</th><th>Code Key</th><th>Max Points</th><th>What it measures</th></tr></thead>
+  <tbody>
+    <tr><td>Amount Fit</td><td class="mono">amountFit</td><td>15</td><td>Loan amount vs LTV-allowed maximum</td></tr>
+    <tr><td>Tenure Fit</td><td class="mono">tenureFit</td><td>10</td><td>Loan maturity age vs retirement ceiling</td></tr>
+    <tr><td>LTV Fit</td><td class="mono">ltvFit</td><td>15</td><td>Actual LTV% vs band limit</td></tr>
+    <tr><td>Age Fit</td><td class="mono">ageFit</td><td>15</td><td>Age bracket optimality</td></tr>
+    <tr><td>Credit Fit</td><td class="mono">creditFit</td><td>20</td><td>Credit score + default + repayment history</td></tr>
+    <tr><td>Income Fit</td><td class="mono">incomeFit</td><td>15</td><td>FOIR + document completeness</td></tr>
+    <tr><td>Co-Applicant Fit</td><td class="mono">coApplicantFit</td><td>10</td><td>Co-applicant presence and relationship</td></tr>
+    <tr><td colspan="2"><strong>Total</strong></td><td><strong>100</strong></td><td></td></tr>
+  </tbody>
+</table>
+
+<h3 id="calc-age">Age at Maturity Formula</h3>
+<div class="formula-box">
+  <div class="formula-title">Age at Loan Maturity</div>
+  <div class="formula-main">Age at Maturity = Current Age + (Tenure Months ÷ 12)</div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Current Age</dt><dd>= Applicant's age in years at time of application (derived from DOB)</dd></div>
+    <div class="var-row"><dt>Tenure Months ÷ 12</dt><dd>= Tenure in years (can be fractional)</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Age at Maturity</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Current Age: <span>35 years</span></div>
+    <div class="we-input-item">Tenure: <span>20 months</span></div>
+    <div class="we-input-item">Maturity ceiling (salaried): <span>60 years</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Age at Maturity =</span>35 + (20 ÷ 12) = 35 + 1.667 = 36.7 years</div>
+    <div class="step-line"><span class="label">Compare to ceiling:</span>36.7 &lt;= 60 → Well within limit → Full score</div>
+    <div class="step-line"><span class="label">Tenure Fit Score =</span>10 × 1.00 = 10</div>
+  </div>
+  <div class="we-result">Age at Maturity = 36.7 years  |  Tenure Fit Score = 10 / 10</div>
+</div>
+
+<h4>Tenure Fit Scoring (10 points)</h4>
+<table class="data-table">
+  <thead><tr><th>Age at Maturity</th><th>Score Fraction</th><th>Points (max 10)</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">&lt;= Maturity Ceiling (60 or 65)</td><td class="highlight">1.00</td><td class="highlight">10</td></tr>
+    <tr><td>Within 3-year grace period beyond ceiling</td><td>0.70</td><td>7</td></tr>
+    <tr><td>More than 3 years beyond ceiling</td><td>0.30</td><td>3</td></tr>
+    <tr><td>Tenure exceeds 360 months hard cap</td><td>—</td><td><span class="badge badge-red">Hard Fail</span></td></tr>
+  </tbody>
+</table>
+
+<h3 id="calc-scoring">Amount Fit Scoring (15 points)</h3>
+<table class="data-table">
+  <thead><tr><th>Loan vs Max LTV Loan</th><th>Score Fraction</th><th>Points (max 15)</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Loan &lt;= Max LTV Loan (₹75L &lt;= ₹75L)</td><td class="highlight">1.00</td><td class="highlight">15</td></tr>
+    <tr><td>Loan up to 10% above Max LTV Loan</td><td>0.65</td><td>10</td></tr>
+    <tr><td>Loan more than 10% above Max LTV Loan</td><td>0.20</td><td>3</td></tr>
+  </tbody>
+</table>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Amount Fit Score</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Requested Loan: <span>₹75,00,000</span></div>
+    <div class="we-input-item">Max Loan by LTV: <span>₹75,00,000</span></div>
+    <div class="we-input-item">Overage: <span>₹0 (exactly at limit)</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Overage =</span>₹75,00,000 − ₹75,00,000 = ₹0</div>
+    <div class="step-line"><span class="label">Overage &lt;= 0 →</span>Full score = 1.00</div>
+    <div class="step-line"><span class="label">Amount Fit Score =</span>15 × 1.00 = 15</div>
+  </div>
+  <div class="we-result">Amount Fit Score = 15 / 15</div>
+</div>
+
+<hr>
+
+<!-- ─── NORMALIZATION ────────────────────────────────────────────────────── -->
+<h2 id="calc-normalization">Score Normalization (0–100)</h2>
+
+<div class="formula-box">
+  <div class="formula-title">Normalization Formula</div>
+  <div class="formula-main">
+                    Sum of Earned Points<br>
+Normalized Score =  ──────────────────── × 100<br>
+                    Total Max Points (100)<br><br>
+(Final score is rounded to the nearest integer)
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Sum of Earned Points</dt><dd>= Sum of all 7 category scores as earned (e.g., 75)</dd></div>
+    <div class="var-row"><dt>Total Max Points</dt><dd>= 100 (sum of all 7 category weights: 15+10+15+15+20+15+10)</dd></div>
+    <div class="var-row"><dt>Normalized Score</dt><dd>= Displayed 0–100 integer in the score ring</dd></div>
+  </div>
+</div>
+
+<h3>Complete Score Walkthrough — Harshavardhana T S</h3>
+
+<div class="worked-example">
+  <div class="we-title">All 7 Categories — Full Derivation</div>
+  <table class="data-table" style="margin:0;">
+    <thead>
+      <tr><th>Category</th><th>Max</th><th>Derivation</th><th>Earned</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="highlight">Amount Fit</td><td>15</td>
+        <td>Loan ₹75L = LTV max ₹75L → Overage 0 → fraction 1.00 → 15 × 1.00</td>
+        <td class="highlight">15</td>
+      </tr>
+      <tr>
+        <td class="highlight">Tenure Fit</td><td>10</td>
+        <td>Age at maturity 36.7 &lt;= ceiling 60 → fraction 1.00 → 10 × 1.00</td>
+        <td class="highlight">10</td>
+      </tr>
+      <tr>
+        <td class="highlight">LTV Fit</td><td>15</td>
+        <td>LTV% 75 &lt;= band 75 → fraction 1.00 → 15 × 1.00</td>
+        <td class="highlight">15</td>
+      </tr>
+      <tr>
+        <td class="highlight">Age Fit</td><td>15</td>
+        <td>Age 35 in range 31–45 (prime) → fraction 1.00 → 15 × 1.00</td>
+        <td class="highlight">15</td>
+      </tr>
+      <tr>
+        <td>Credit Fit</td><td>20</td>
+        <td>Score 650 → 0.45 → base 9; Good history (×1.00); Minor default (×0.85) → 9×0.85=7.65→8</td>
+        <td>8</td>
+      </tr>
+      <tr>
+        <td>Income Fit</td><td>15</td>
+        <td>FOIR 345.3% &gt; 60% → 0.15 → 15×0.15=2.25→2; Missing docs →2×0.85=1.70→2</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>Co-Applicant Fit</td><td>10</td>
+        <td>Co-applicant present with accepted relationship → fraction 1.00 → 10 × 1.00</td>
+        <td>10</td>
+      </tr>
+      <tr style="border-top:2px solid var(--accent)">
+        <td class="highlight"><strong>TOTAL</strong></td><td><strong>100</strong></td>
+        <td><strong>Sum of earned points</strong></td>
+        <td class="highlight"><strong>75</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:14px;">
+    <div class="we-steps">
+      <div class="step-line"><span class="label">Normalized Score =</span>(75 ÷ 100) × 100 = 75</div>
+    </div>
+    <div class="we-result">Final Eligibility Score = 75 / 100 &nbsp;→&nbsp; "Eligible with Conditions"</div>
+  </div>
+</div>
+
+<h4>Category Pass / Warning / Fail Threshold Formula</h4>
+<div class="formula-box">
+  <div class="formula-title">Bar Colour and Status Label Calculation</div>
+  <div class="formula-main">
+    pct = earned ÷ maxScore   (0.0 to 1.0)<br><br>
+    if pct &gt;= 0.80  →  Status = "Pass"     (green bar)<br>
+    if pct &gt;= 0.40  →  Status = "Warning"  (amber bar)<br>
+    if pct &lt;  0.40  →  Status = "Fail"     (red bar)<br><br>
+    Special case: if maxScore = 0 (Product Fit)  →  pct = 1.0 (informational, no colour)
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>pct</dt><dd>= Percentage of the category's maximum score that was earned</dd></div>
+    <div class="var-row"><dt>earned</dt><dd>= Points scored in the category (after all modifiers)</dd></div>
+    <div class="var-row"><dt>maxScore</dt><dd>= Maximum available points for this category</dd></div>
+  </div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Category</th><th>earned / max</th><th>pct</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Amount Fit</td><td>15 / 15</td><td>1.00 (&gt;= 0.80)</td><td><span class="badge badge-green">Pass</span></td></tr>
+    <tr><td>Tenure Fit</td><td>10 / 10</td><td>1.00 (&gt;= 0.80)</td><td><span class="badge badge-green">Pass</span></td></tr>
+    <tr><td>LTV Fit</td><td>15 / 15</td><td>1.00 (&gt;= 0.80)</td><td><span class="badge badge-green">Pass</span></td></tr>
+    <tr><td>Age Fit</td><td>15 / 15</td><td>1.00 (&gt;= 0.80)</td><td><span class="badge badge-green">Pass</span></td></tr>
+    <tr><td>Credit Fit</td><td>8 / 20</td><td>0.40 (&gt;= 0.40, &lt; 0.80)</td><td><span class="badge badge-amber">Warning</span></td></tr>
+    <tr><td>Income Fit</td><td>2 / 15</td><td>0.13 (&lt; 0.40)</td><td><span class="badge badge-red">Fail</span></td></tr>
+    <tr><td>Co-Applicant Fit</td><td>10 / 10</td><td>1.00 (&gt;= 0.80)</td><td><span class="badge badge-green">Pass</span></td></tr>
+  </tbody>
+</table>
+
+<h4>Recommended Tenure Formula</h4>
+<div class="formula-box">
+  <div class="formula-title">Recommended Tenure (shown on Step 11)</div>
+  <div class="formula-main">
+    Recommended Tenure = min( Requested Tenure,  (Maturity Ceiling − Current Age) × 12 )
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>Requested Tenure</dt><dd>= Tenure entered in Step 1 (months)</dd></div>
+    <div class="var-row"><dt>Maturity Ceiling</dt><dd>= 60 years (salaried) or 65 years (self-employed)</dd></div>
+    <div class="var-row"><dt>Current Age</dt><dd>= Derived from DOB</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Recommended Tenure</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Requested Tenure: <span>20 months</span></div>
+    <div class="we-input-item">Maturity Ceiling: <span>60 years (salaried)</span></div>
+    <div class="we-input-item">Current Age: <span>35 years</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Max tenure before ceiling:</span>(60 − 35) × 12 = 25 × 12 = 300 months</div>
+    <div class="step-line"><span class="label">Recommended tenure:</span>min(20, 300) = 20 months</div>
+  </div>
+  <div class="we-result">Recommended Tenure = 20 months (shorter than ceiling allows — no adjustment needed)</div>
+</div>
+
+<h4>Category Bars — Step 10 Visual (as shown in the application)</h4>
+<div style="margin:14px 0;">
+  <div class="category-row">
+    <div class="cat-label">Amount Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar pass" style="width:100%"></div></div>
+    <div class="cat-score">15 / 15 &nbsp;<span class="badge badge-green" style="font-size:10px;">Pass</span></div>
+  </div>
+  <div class="category-row">
+    <div class="cat-label">Tenure Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar pass" style="width:100%"></div></div>
+    <div class="cat-score">10 / 10 &nbsp;<span class="badge badge-green" style="font-size:10px;">Pass</span></div>
+  </div>
+  <div class="category-row">
+    <div class="cat-label">LTV Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar pass" style="width:100%"></div></div>
+    <div class="cat-score">15 / 15 &nbsp;<span class="badge badge-green" style="font-size:10px;">Pass</span></div>
+  </div>
+  <div class="category-row">
+    <div class="cat-label">Age Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar pass" style="width:100%"></div></div>
+    <div class="cat-score">15 / 15 &nbsp;<span class="badge badge-green" style="font-size:10px;">Pass</span></div>
+  </div>
+  <div class="category-row">
+    <div class="cat-label">Credit Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar warning" style="width:40%"></div></div>
+    <div class="cat-score">8 / 20 &nbsp;<span class="badge badge-amber" style="font-size:10px;">Warning</span></div>
+  </div>
+  <div class="category-row">
+    <div class="cat-label">Income Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar fail" style="width:13%"></div></div>
+    <div class="cat-score">2 / 15 &nbsp;<span class="badge badge-red" style="font-size:10px;">Fail</span></div>
+  </div>
+  <div class="category-row">
+    <div class="cat-label">Co-Applicant Fit</div>
+    <div class="cat-bar-wrap"><div class="cat-bar pass" style="width:100%"></div></div>
+    <div class="cat-score">10 / 10 &nbsp;<span class="badge badge-green" style="font-size:10px;">Pass</span></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── STEP 11 ─────────────────────────────────────────────────────────── -->
+<h2 id="step11">Step 11 — Final Decision</h2>
+<div class="step-header">
+  <div class="step-number">11</div>
+  <div><h3>Your eligibility result and recommended next steps</h3><p style="margin:0;color:var(--muted);font-size:13px;">Outcome card, conditions, indicative rate range, and print/PDF export.</p></div>
+</div>
+
+<h3 id="calc-outcomes">Outcome Mapping Logic</h3>
+
+<div class="formula-box">
+  <div class="formula-title">Outcome Decision (in order of priority)</div>
+  <div class="formula-main">
+    1. if (any hard fail triggered)     →  "Not Eligible"  (score ignored)<br>
+    2. else if (score &gt;= 85)         →  "Eligible"<br>
+    3. else if (score &gt;= 65)         →  "Eligible with Conditions"<br>
+    4. else if (score &gt;= 40)         →  "Needs Review"<br>
+    5. else                             →  "Not Eligible"
+  </div>
+</div>
+
+<div class="outcome-cards">
+  <div class="outcome-card oc-eligible">
+    <h4>Eligible — Score &gt;= 85</h4>
+    <p style="color:#94a3b8;">Strong application. Lender likely to approve at standard rate. Proceed with formal documentation.</p>
+  </div>
+  <div class="outcome-card oc-cond">
+    <h4>Eligible with Conditions — 65–84</h4>
+    <p style="color:#94a3b8;"><strong>Score 75</strong> — Harshavardhana T S falls here. Approval probable with conditions (higher rate, additional docs, or reduced loan amount).</p>
+  </div>
+  <div class="outcome-card oc-review">
+    <h4>Needs Review — 40–64</h4>
+    <p style="color:#94a3b8;">Manual underwriter review required. Approval possible with exceptions or at specialist rate.</p>
+  </div>
+  <div class="outcome-card oc-no">
+    <h4>Not Eligible — &lt; 40 or Hard Fail</h4>
+    <p style="color:#94a3b8;">Does not meet policy criteria. Address hard fail conditions or raise the composite score significantly.</p>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Outcome Determination (Harshavardhana T S)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Hard fail triggered: <span>No</span></div>
+    <div class="we-input-item">Normalized score: <span>75</span></div>
+    <div class="we-input-item">Threshold check: <span>65 &lt;= 75 &lt; 85</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Check 1 — Hard fail?</span>No → continue</div>
+    <div class="step-line"><span class="label">Check 2 — Score 75 &gt;= 85?</span>No</div>
+    <div class="step-line"><span class="label">Check 3 — Score 75 &gt;= 65?</span>Yes → Outcome = "Eligible with Conditions"</div>
+  </div>
+  <div class="we-result">Outcome = "Eligible with Conditions"  (Score 75 falls in the 65–84 band)</div>
+</div>
+
+<h3>Formulas Computed and Displayed on Step 11</h3>
+
+<h4>Processing Fee Calculation</h4>
+<div class="formula-box">
+  <div class="formula-title">Processing Fee (1%–2% of Loan Amount + 18% GST)</div>
+  <div class="formula-main">
+    Processing Fee<sub>min</sub> = Loan Amount × 0.01<br>
+    Processing Fee<sub>max</sub> = Loan Amount × 0.02<br><br>
+    Fee with GST<sub>min</sub> = Processing Fee<sub>min</sub> × (1 + 0.18)<br>
+    Fee with GST<sub>max</sub> = Processing Fee<sub>max</sub> × (1 + 0.18)
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>0.01 / 0.02</dt><dd>= 1%–2% of loan amount (policy range)</dd></div>
+    <div class="var-row"><dt>0.18</dt><dd>= 18% GST rate applied on top of processing fee</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Processing Fee (₹75L Loan)</div>
+  <div class="we-inputs">
+    <div class="we-input-item">Loan Amount: <span>₹75,00,000</span></div>
+    <div class="we-input-item">Fee Range: <span>1%–2%</span></div>
+    <div class="we-input-item">GST: <span>18%</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Min Fee:</span>₹75,00,000 × 0.01 = ₹75,000</div>
+    <div class="step-line"><span class="label">Max Fee:</span>₹75,00,000 × 0.02 = ₹1,50,000</div>
+    <div class="step-line"><span class="label">Min Fee + GST:</span>₹75,000 × 1.18 = ₹88,500</div>
+    <div class="step-line"><span class="label">Max Fee + GST:</span>₹1,50,000 × 1.18 = ₹1,77,000</div>
+  </div>
+  <div class="we-result">Processing Fee Range = ₹88,500 – ₹1,77,000 (including 18% GST)</div>
+</div>
+
+<h4>Total Interest Cost Over Full Tenure</h4>
+<div class="formula-box">
+  <div class="formula-title">Total Interest Paid</div>
+  <div class="formula-main">
+    Total Amount Paid = EMI × n<br>
+    Total Interest     = Total Amount Paid − Principal
+  </div>
+  <div class="formula-vars">
+    <div class="var-row"><dt>EMI</dt><dd>= Monthly instalment (from EMI formula)</dd></div>
+    <div class="var-row"><dt>n</dt><dd>= Tenure in months</dd></div>
+    <div class="var-row"><dt>Principal</dt><dd>= Loan Amount (P)</dd></div>
+  </div>
+</div>
+
+<div class="worked-example">
+  <div class="we-title">Worked Example — Total Interest Cost</div>
+  <div class="we-inputs">
+    <div class="we-input-item">EMI: <span>₹4,04,371</span></div>
+    <div class="we-input-item">Tenure (n): <span>20 months</span></div>
+    <div class="we-input-item">Principal: <span>₹75,00,000</span></div>
+  </div>
+  <div class="we-steps">
+    <div class="step-line"><span class="label">Total Paid:</span>₹4,04,371 × 20 = ₹80,87,420</div>
+    <div class="step-line"><span class="label">Total Interest:</span>₹80,87,420 − ₹75,00,000 = ₹5,87,420</div>
+    <div class="step-line"><span class="label">Interest as % of loan:</span>₹5,87,420 ÷ ₹75,00,000 = 7.8% of principal</div>
+  </div>
+  <div class="we-result">Total Interest = ₹5,87,420 over 20 months (short tenure = low total interest but huge EMI)</div>
+</div>
+
+<h4>What Step 11 displays</h4>
+<table class="data-table">
+  <thead><tr><th>Item shown</th><th>Formula / Source</th><th>Example value</th></tr></thead>
+  <tbody>
+    <tr><td>Outcome card</td><td>Score + hard-fail logic (decision tree)</td><td>Eligible with Conditions</td></tr>
+    <tr><td>Eligibility score</td><td>(Σ earned ÷ 100) × 100</td><td>75</td></tr>
+    <tr><td>Recommended max loan</td><td>Max Loan<sub>LTV</sub> = EPV × LTV Band</td><td>₹75,00,000</td></tr>
+    <tr><td>Recommended tenure</td><td>min(requested, (ceiling − age) × 12)</td><td>20 months</td></tr>
+    <tr><td>Estimated EMI</td><td>P × r × (1+r)^n / ((1+r)^n − 1)</td><td>₹4,04,371 / month</td></tr>
+    <tr><td>Total interest cost</td><td>EMI × n − P</td><td>₹5,87,420</td></tr>
+    <tr><td>Processing fee range</td><td>P × 1%–2% × 1.18 (GST)</td><td>₹88,500–₹1,77,000</td></tr>
+    <tr><td>Indicative rate range</td><td>Floating range, narrowed if score &gt;= 750</td><td>8.00%–9.15% p.a.</td></tr>
+    <tr><td>All category flags</td><td>Errors / Warnings / Info from engine</td><td>FOIR flag, credit warning</td></tr>
+  </tbody>
+</table>
+
+<h4>Print / PDF Export</h4>
+<p>The <strong>Print Summary</strong> button calls <code>window.print()</code>. CSS <code>@media print</code> rules hide everything except the summary card (<code>#printable-summary</code>). In the browser's print dialog, choose "Save as PDF" to get a clean, single-page export with no sidebars or navigation.</p>
+
+<hr>
+
+<!-- ─── POLICY THRESHOLDS ──────────────────────────────────────────────── -->
+<h2 id="policy-thresholds">Policy Thresholds — Complete Reference</h2>
+
+<h3>Loan Limits</h3>
+<table class="data-table">
+  <thead><tr><th>Parameter</th><th>Policy Value</th></tr></thead>
+  <tbody>
+    <tr><td>Minimum Loan Amount</td><td>₹1,00,000 (₹1 Lakh)</td></tr>
+    <tr><td>Maximum Loan Amount</td><td>₹10,00,00,000 (₹10 Crore)</td></tr>
+    <tr><td>Minimum Tenure</td><td>12 months (1 year)</td></tr>
+    <tr><td>Maximum Tenure</td><td>360 months (30 years)</td></tr>
+  </tbody>
+</table>
+
+<h3>Credit Score Bands</h3>
+<table class="data-table">
+  <thead><tr><th>Band Name</th><th>Score Range</th><th>Policy Threshold Label</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Strong</td><td class="highlight">&gt;= 750</td><td>strongThreshold</td></tr>
+    <tr><td>Acceptable</td><td>700–749</td><td>acceptableThreshold</td></tr>
+    <tr><td>Needs Review</td><td>650–699</td><td>reviewThreshold</td></tr>
+    <tr><td>Low</td><td>550–649</td><td>hardFailThreshold (lower bound)</td></tr>
+    <tr><td>Very Low</td><td>&lt; 550</td><td>Below hardFailThreshold</td></tr>
+  </tbody>
+</table>
+
+<h3>Interest Rates (Indicative)</h3>
+<table class="data-table">
+  <thead><tr><th>Rate Type</th><th>Min</th><th>Max</th><th>EMI Estimation Rate</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">Floating</td><td>8.00%</td><td>9.15%</td><td class="highlight">8.75% (policy mid-point)</td></tr>
+    <tr><td>Fixed</td><td>—</td><td>14.00%</td><td>14.00%</td></tr>
+  </tbody>
+</table>
+
+<h3>Processing Fee Formula</h3>
+<div class="formula-box">
+  <div class="formula-title">Processing Fee</div>
+  <div class="formula-main">
+    Processing Fee = Loan Amount × Rate%   (range: 1%–2%)<br>
+    Fee with GST   = Processing Fee × (1 + 0.18)
+  </div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Loan Amount</th><th>Min Fee (1%)</th><th>Max Fee (2%)</th><th>Min + GST</th><th>Max + GST</th></tr></thead>
+  <tbody>
+    <tr><td class="highlight">₹75,00,000 (example)</td><td>₹75,000</td><td>₹1,50,000</td><td>₹88,500</td><td>₹1,77,000</td></tr>
+  </tbody>
+</table>
+
+<h3>Prepayment Policy</h3>
+<table class="data-table">
+  <thead><tr><th>Rule</th><th>Policy Value</th></tr></thead>
+  <tbody>
+    <tr><td>Floating rate individual borrower</td><td>Nil prepayment charges (RBI mandate)</td></tr>
+    <tr><td>Minimum EMIs before first prepayment allowed</td><td>12 months</td></tr>
+    <tr><td>Maximum prepayments per financial year</td><td>2 times</td></tr>
+    <tr><td>Maximum amount per prepayment instance</td><td>25% of outstanding principal</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- ─── HARD FAILS ─────────────────────────────────────────────────────── -->
+<h2 id="hard-fails">Hard Fail Conditions</h2>
+<p>Any of the following triggers an automatic <strong>Not Eligible</strong> outcome, regardless of the composite score. Hard fails cannot be overridden by scoring.</p>
+
+<table class="data-table">
+  <thead><tr><th>Condition</th><th>Step</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-red">Hard Fail</span> Loan amount = 0 or not provided</td><td>1</td><td>No valid quantum to assess</td></tr>
+    <tr><td><span class="badge badge-red">Hard Fail</span> Loan amount &gt; ₹10,00,00,000</td><td>1</td><td>Exceeds published maximum limit</td></tr>
+    <tr><td><span class="badge badge-red">Hard Fail</span> Tenure &gt; 360 months</td><td>1</td><td>Exceeds maximum permitted tenor</td></tr>
+    <tr><td><span class="badge badge-red">Hard Fail</span> Applicant age &lt; 21 years</td><td>2</td><td>Below minimum eligibility age</td></tr>
+    <tr><td><span class="badge badge-red">Hard Fail</span> Wilful default / fraud flag</td><td>4</td><td>Disqualifying credit event — mandatory manual review</td></tr>
+  </tbody>
+</table>
+
+<div class="info-card danger">
+  <h4>Hard fails override the score completely</h4>
+  <p style="margin:0;font-size:13px;">Even a perfect score of 100/100 across all categories is overridden to "Not Eligible" if a hard fail is triggered. Hard fails represent bright-line rules in the policy where no lender discretion is permitted under standard underwriting.</p>
+</div>
+
+<hr>
+
+<!-- ─── FEATURES ───────────────────────────────────────────────────────── -->
+<h2 id="features">App Features</h2>
+<table class="data-table">
+  <thead><tr><th>Feature</th><th>How it works</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="highlight">Auto-Save Draft</td>
+      <td>After 800ms of inactivity, the full form state is saved to <code>localStorage</code> under the key <code>loan_wizard_draft</code>. On the next visit, a "Resume Draft" banner appears on the first step.</td>
+    </tr>
+    <tr>
+      <td>Live FOIR Display</td>
+      <td>Step 5 shows the Total Income, Existing EMIs, New EMI estimate, and FOIR% in real time as you type — before you reach the Review step.</td>
+    </tr>
+    <tr>
+      <td>Sticky Side Panel</td>
+      <td>On screens wider than 1280px, a right-hand panel shows the live eligibility score ring, outcome badge, and top 5 flags as you move through each step.</td>
+    </tr>
+    <tr>
+      <td>Dark Mode</td>
+      <td>Follows the system <code>prefers-color-scheme: dark</code>. Can also be toggled manually in the header.</td>
+    </tr>
+    <tr>
+      <td class="highlight">Print / PDF Export</td>
+      <td>Step 11 "Print Summary" button triggers <code>window.print()</code>. CSS <code>@media print</code> hides all navigation, sidebars, and buttons. Use the browser's "Save as PDF" option for a clean export.</td>
+    </tr>
+    <tr>
+      <td>Step Validation</td>
+      <td>Forward navigation is blocked until all required fields in the current step are valid. Backward navigation to any completed step is always available.</td>
+    </tr>
+    <tr>
+      <td>Score Ring</td>
+      <td>SVG radial ring changes colour by outcome: green (score &gt;= 85), blue (65–84), amber (40–64), red (&lt;40). Updates live as data is entered.</td>
+    </tr>
+    <tr>
+      <td>Policy-Driven Engine</td>
+      <td>All thresholds and weights are in <code>src/config/policy.ts</code>. No hardcoded values elsewhere. Update one file to change any threshold across the entire application.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<div style="margin-top:40px;padding:20px 0;border-top:1px solid var(--border);color:var(--muted);font-size:12px;">
+  <p>Home Loan Eligibility Checker v1.0 &nbsp;·&nbsp; React 18 + TypeScript 5 + Tailwind CSS + Vite &nbsp;·&nbsp; Policy source: <code>src/config/policy.ts</code></p>
+  <p style="margin-top:4px;">This tool provides a pre-screening indication only. It does not constitute a formal loan offer or credit decision. Final approval is at the sole discretion of the lending institution.</p>
+</div>
+
+</main>
+</div>
+
+<script>
+const navLinks = document.querySelectorAll('nav ul li a');
+const sections = document.querySelectorAll('[id]');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(link => {
+        link.parentElement.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+import type { WizardState } from '../types';
+
+export const MOCK_STATE_ELIGIBLE: Partial<WizardState> = {
+  step1: {
+    desiredLoanAmount: 60_00_000,
+    requestedTenureMonths: 240,
+    loanPurpose: 'ready_property_purchase',
+    propertyType: 'flat_apartment',
+  },
+  step2: {
+    applicantName: 'Arjun Sharma',
+    dateOfBirth: '1985-04-15',
+    employmentType: 'salaried',
+    maritalStatus: 'married',
+  },
+  step3: {
+    marketValue: 85_00_000,
+    agreementValue: 83_00_000,
+    ownContribution: 25_00_000,
+    useAgreementValueIfLower: true,
+  },
+  step4: {
+    creditScore: 780,
+    hasDefaults: false,
+    defaultDetails: '',
+    defaultSeverity: 'none',
+    existingLoans: [
+      { id: '1', loanType: 'car_loan', outstandingAmount: 3_00_000, monthlyEMI: 8000 },
+    ],
+    repaymentHistory: 'excellent',
+  },
+  step5: {
+    monthlyNetIncome: 1_20_000,
+    otherMonthlyIncome: 15_000,
+    employmentStabilityYears: 8,
+    hasSalarySlips: true,
+    hasITR: true,
+    hasBankStatements: true,
+    hasFormSixteen: true,
+    hasGSTReturns: false,
+    hasAuditedFinancials: false,
+  },
+  step6: {
+    numberOfPropertyOwners: 2,
+    numberOfCoApplicants: 1,
+    coApplicantRelationship: 'spouse',
+    allOwnersIncluded: true,
+    coApplicantIncome: 80_000,
+  },
+  step7: { rateType: 'floating', productVariant: 'standard' },
+  step8: { wantsChargesPreview: true, loanCategory: 'standard_purchase' },
+  step9: { intendsToPrepay: false, anticipatedPrepaymentBehavior: 'none', preferEMIReduction: true },
+};
+
+export const MOCK_STATE_NEEDS_REVIEW: Partial<WizardState> = {
+  step1: {
+    desiredLoanAmount: 45_00_000,
+    requestedTenureMonths: 300,
+    loanPurpose: 'under_construction_purchase',
+    propertyType: 'flat_apartment',
+  },
+  step2: {
+    applicantName: 'Priya Mehta',
+    dateOfBirth: '1975-11-20',
+    employmentType: 'self_employed',
+    maritalStatus: 'married',
+  },
+  step3: {
+    marketValue: 60_00_000,
+    agreementValue: 58_00_000,
+    ownContribution: 13_00_000,
+    useAgreementValueIfLower: true,
+  },
+  step4: {
+    creditScore: 660,
+    hasDefaults: true,
+    defaultDetails: 'One credit card payment missed in 2022, settled.',
+    defaultSeverity: 'minor',
+    existingLoans: [
+      { id: '1', loanType: 'business_loan', outstandingAmount: 10_00_000, monthlyEMI: 22_000 },
+      { id: '2', loanType: 'personal_loan', outstandingAmount: 2_00_000, monthlyEMI: 7_000 },
+    ],
+    repaymentHistory: 'fair',
+  },
+  step5: {
+    monthlyNetIncome: 80_000,
+    otherMonthlyIncome: 10_000,
+    employmentStabilityYears: 5,
+    hasSalarySlips: false,
+    hasITR: true,
+    hasBankStatements: true,
+    hasFormSixteen: false,
+    hasGSTReturns: true,
+    hasAuditedFinancials: false,
+  },
+  step6: {
+    numberOfPropertyOwners: 1,
+    numberOfCoApplicants: 0,
+    coApplicantRelationship: '',
+    allOwnersIncluded: true,
+    coApplicantIncome: 0,
+  },
+  step7: { rateType: 'floating', productVariant: 'standard' },
+  step8: { wantsChargesPreview: true, loanCategory: 'standard_purchase' },
+  step9: { intendsToPrepay: true, anticipatedPrepaymentBehavior: 'occasional', preferEMIReduction: false },
+};
