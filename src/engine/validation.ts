@@ -30,6 +30,8 @@ export const validateStep1: Validator<Step1Data> = (d) => {
     errors.requestedTenureMonths = `Maximum tenure is ${POLICY.loanLimits.maxTenureMonths} months (30 years).`;
   }
 
+  if (!d.selectedBank) errors.selectedBank = 'Please select a bank.';
+  if (d.selectedBank && !d.selectedPlan) errors.selectedPlan = 'Please select a loan plan.';
   if (!d.loanPurpose) errors.loanPurpose = 'Please select a loan purpose.';
   if (!d.propertyType) errors.propertyType = 'Please select a property type.';
 

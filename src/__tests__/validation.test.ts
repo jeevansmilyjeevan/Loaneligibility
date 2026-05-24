@@ -6,6 +6,8 @@ import type { Step1Data, Step2Data, Step3Data, Step4Data, Step5Data } from '../t
 
 describe('validateStep1', () => {
   const valid: Step1Data = {
+    selectedBank: 'sbi',
+    selectedPlan: 'sbi_regular',
     desiredLoanAmount: 50_00_000,
     requestedTenureMonths: 240,
     loanPurpose: 'ready_property_purchase',

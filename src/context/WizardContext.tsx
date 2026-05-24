@@ -20,6 +20,8 @@ const INITIAL_STATE: WizardState = {
   currentStep: 0,
   completedSteps: new Set<number>(),
   step1: {
+    selectedBank: '',
+    selectedPlan: '',
     desiredLoanAmount: '',
     requestedTenureMonths: 240,
     loanPurpose: '',

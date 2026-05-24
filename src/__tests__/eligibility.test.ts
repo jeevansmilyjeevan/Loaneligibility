@@ -9,6 +9,8 @@ function makeState(overrides: Partial<WizardState> = {}): WizardState {
     currentStep: 9,
     completedSteps: new Set([0, 1, 2, 3, 4, 5, 6, 7, 8]),
     step1: {
+      selectedBank: 'sbi',
+      selectedPlan: 'sbi_regular',
       desiredLoanAmount: 60_00_000,
       requestedTenureMonths: 240,
       loanPurpose: 'ready_property_purchase',

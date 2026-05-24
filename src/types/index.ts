@@ -47,6 +47,8 @@ export type EligibilityOutcome =
 // ─── Step Data Interfaces ─────────────────────────────────────────────────────
 
 export interface Step1Data {
+  selectedBank: string;
+  selectedPlan: string;
   desiredLoanAmount: number | '';
   requestedTenureMonths: number | '';
   loanPurpose: LoanPurpose | '';

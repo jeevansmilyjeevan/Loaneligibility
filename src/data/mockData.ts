@@ -2,6 +2,8 @@ import type { WizardState } from '../types';
 
 export const MOCK_STATE_ELIGIBLE: Partial<WizardState> = {
   step1: {
+    selectedBank: 'sbi',
+    selectedPlan: 'sbi_regular',
     desiredLoanAmount: 60_00_000,
     requestedTenureMonths: 240,
     loanPurpose: 'ready_property_purchase',
@@ -54,6 +56,8 @@ export const MOCK_STATE_ELIGIBLE: Partial<WizardState> = {
 
 export const MOCK_STATE_NEEDS_REVIEW: Partial<WizardState> = {
   step1: {
+    selectedBank: 'sbi',
+    selectedPlan: 'sbi_regular',
     desiredLoanAmount: 45_00_000,
     requestedTenureMonths: 300,
     loanPurpose: 'under_construction_purchase',
