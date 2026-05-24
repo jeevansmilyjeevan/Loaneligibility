@@ -26,7 +26,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-200">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+        <div className="w-full px-4 sm:px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <span className="text-white text-xs font-bold">HL</span>
@@ -50,7 +50,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Button>
         </div>
         {/* Stepper row */}
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 py-2">
+        <div className="w-full px-2 sm:px-6 py-2">
           <Stepper
             currentStep={state.currentStep}
             completedSteps={state.completedSteps}
@@ -60,7 +60,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex gap-6 items-start">
+      <div className="w-full px-4 sm:px-6 py-6 flex gap-6 items-start">
         {/* Main content */}
         <main className="flex-1 min-w-0 animate-slide-in" role="main">
           {children}
