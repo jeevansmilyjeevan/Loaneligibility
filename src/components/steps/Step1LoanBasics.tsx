@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useWizard } from '../../context/WizardContext';
 import { validateStep1 } from '../../engine/validation';
 import { Card, SectionTitle } from '../ui/Card';
@@ -14,9 +14,14 @@ import { FormulaPanel } from '../ui/FormulaPanel';
 import type { StepErrors } from '../../types';
 
 export function Step1LoanBasics() {
-  const { state, updateStep1, goToStep, completeStep, saveDraft, resetWizard } = useWizard();
-  const { step1 } = state;
+  const { state, updateStep1, updateStep5, goToStep, completeStep, saveDraft, resetWizard } = useWizard();
+  const { step1, step5 } = state;
   const [errors, setErrors] = useState<StepErrors>({});
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({});
+
+  const handleFileSelect = (key: string, file: File) => {
+    setUploadedFiles((prev) => ({ ...prev, [key]: file.name }));
+  };
 
   const handleNext = () => {
     const errs = validateStep1(step1);
@@ -266,6 +271,67 @@ if Overage / Max Loan  > 10%           → Score = 3   (low)`}
         />
       </div>
 
+      {/* Document availability */}
+      <Card>
+        <SectionTitle subtitle="Mark which documents you have ready and optionally upload copies for reference.">
+          Document Availability
+        </SectionTitle>
+
+        <div className="mt-4 space-y-6">
+
+          {/* KYC / Identity */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+              KYC / Identity
+            </p>
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              <DocRow label="Aadhaar Card" checked={step1.hasAadhaar} onCheckChange={(v) => updateStep1({ hasAadhaar: v })} uploadedFileName={uploadedFiles['aadhaar']} onFileSelect={(f) => handleFileSelect('aadhaar', f)} />
+              <DocRow label="PAN Card" checked={step1.hasPAN} onCheckChange={(v) => updateStep1({ hasPAN: v })} uploadedFileName={uploadedFiles['pan']} onFileSelect={(f) => handleFileSelect('pan', f)} />
+              <DocRow label="Address Proof (utility bill / passport / ration card)" checked={step1.hasAddressProof} onCheckChange={(v) => updateStep1({ hasAddressProof: v })} uploadedFileName={uploadedFiles['addressProof']} onFileSelect={(f) => handleFileSelect('addressProof', f)} />
+            </div>
+          </div>
+
+          {/* Income — Salaried */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+              Income — Salaried
+            </p>
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              <DocRow label="Salary slips (last 3–6 months)" checked={step5.hasSalarySlips} onCheckChange={(v) => updateStep5({ hasSalarySlips: v })} uploadedFileName={uploadedFiles['salarySlips']} onFileSelect={(f) => handleFileSelect('salarySlips', f)} />
+              <DocRow label="ITR with computation (last 2 years)" checked={step5.hasITR} onCheckChange={(v) => updateStep5({ hasITR: v })} uploadedFileName={uploadedFiles['itr_sal']} onFileSelect={(f) => handleFileSelect('itr_sal', f)} />
+              <DocRow label="Bank statements (last 6 months)" checked={step5.hasBankStatements} onCheckChange={(v) => updateStep5({ hasBankStatements: v })} uploadedFileName={uploadedFiles['bankStmt_sal']} onFileSelect={(f) => handleFileSelect('bankStmt_sal', f)} />
+              <DocRow label="Form 16 (last 2 years)" checked={step5.hasFormSixteen} onCheckChange={(v) => updateStep5({ hasFormSixteen: v })} uploadedFileName={uploadedFiles['form16']} onFileSelect={(f) => handleFileSelect('form16', f)} />
+            </div>
+          </div>
+
+          {/* Income — Self-Employed */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+              Income — Self-Employed / Business
+            </p>
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              <DocRow label="ITR with computation (last 3 years)" checked={step5.hasITR} onCheckChange={(v) => updateStep5({ hasITR: v })} uploadedFileName={uploadedFiles['itr_se']} onFileSelect={(f) => handleFileSelect('itr_se', f)} />
+              <DocRow label="Business bank statements (last 12 months)" checked={step5.hasBankStatements} onCheckChange={(v) => updateStep5({ hasBankStatements: v })} uploadedFileName={uploadedFiles['bankStmt_se']} onFileSelect={(f) => handleFileSelect('bankStmt_se', f)} />
+              <DocRow label="GST returns (last 12 months, if applicable)" checked={step5.hasGSTReturns} onCheckChange={(v) => updateStep5({ hasGSTReturns: v })} uploadedFileName={uploadedFiles['gst']} onFileSelect={(f) => handleFileSelect('gst', f)} />
+              <DocRow label="Audited financials / CA-certified P&L and Balance Sheet" checked={step5.hasAuditedFinancials} onCheckChange={(v) => updateStep5({ hasAuditedFinancials: v })} uploadedFileName={uploadedFiles['auditedFinancials']} onFileSelect={(f) => handleFileSelect('auditedFinancials', f)} />
+            </div>
+          </div>
+
+          {/* Property Documents */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+              Property Documents
+            </p>
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              <DocRow label="Sale Agreement / ATS (Agreement to Sell)" checked={step1.hasSaleAgreement} onCheckChange={(v) => updateStep1({ hasSaleAgreement: v })} uploadedFileName={uploadedFiles['saleAgreement']} onFileSelect={(f) => handleFileSelect('saleAgreement', f)} />
+              <DocRow label="Title Deed / Ownership documents" checked={step1.hasTitleDeed} onCheckChange={(v) => updateStep1({ hasTitleDeed: v })} uploadedFileName={uploadedFiles['titleDeed']} onFileSelect={(f) => handleFileSelect('titleDeed', f)} />
+              <DocRow label="Building approval / Sanction plan" checked={step1.hasBuildingApproval} onCheckChange={(v) => updateStep1({ hasBuildingApproval: v })} uploadedFileName={uploadedFiles['buildingApproval']} onFileSelect={(f) => handleFileSelect('buildingApproval', f)} />
+            </div>
+          </div>
+
+        </div>
+      </Card>
+
       <WizardNavigation
         currentStep={0}
         totalSteps={11}
@@ -275,5 +341,58 @@ if Overage / Max Loan  > 10%           → Score = 3   (low)`}
         onReset={resetWizard}
       />
     </>
+  );
+}
+
+function DocRow({
+  label,
+  checked,
+  onCheckChange,
+  onFileSelect,
+  uploadedFileName,
+}: {
+  label: string;
+  checked: boolean;
+  onCheckChange: (v: boolean) => void;
+  onFileSelect: (file: File) => void;
+  uploadedFileName?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div className="flex items-center gap-3 py-2.5">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onCheckChange(e.target.checked)}
+        className="w-4 h-4 shrink-0 accent-blue-600 cursor-pointer"
+      />
+      <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 leading-snug">{label}</span>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="shrink-0 text-xs px-3 py-1 rounded-lg border border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+      >
+        {uploadedFileName ? 'Change' : 'Upload'}
+      </button>
+      {uploadedFileName && (
+        <span
+          className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[130px]"
+          title={uploadedFileName}
+        >
+          {uploadedFileName}
+        </span>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onFileSelect(f);
+          e.target.value = '';
+        }}
+      />
+    </div>
   );
 }

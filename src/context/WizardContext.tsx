@@ -26,6 +26,12 @@ const INITIAL_STATE: WizardState = {
     requestedTenureMonths: 240,
     loanPurpose: '',
     propertyType: '',
+    hasAadhaar: false,
+    hasPAN: false,
+    hasAddressProof: false,
+    hasSaleAgreement: false,
+    hasTitleDeed: false,
+    hasBuildingApproval: false,
   },
   step2: {
     applicantName: '',

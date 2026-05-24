@@ -4,7 +4,6 @@ import { validateStep5 } from '../../engine/validation';
 import { Card, SectionTitle } from '../ui/Card';
 import { FormField, FormRow } from '../ui/FormField';
 import { CurrencyInput, NumberInput } from '../ui/Input';
-import { Checkbox } from '../ui/Checkbox';
 import { Alert } from '../ui/Alert';
 import { Badge } from '../ui/Badge';
 import { WizardNavigation } from '../layout/WizardNavigation';
@@ -131,37 +130,6 @@ export function Step5Income() {
             </div>
           )}
 
-          {/* Document checklist */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-              Document Availability
-              <span className="ml-2 text-xs font-normal text-gray-400">(mark what you have ready)</span>
-            </h3>
-
-            <div className="space-y-2">
-              {isSalaried ? (
-                <>
-                  <Checkbox label="Salary slips (last 3–6 months)" checked={step5.hasSalarySlips} onChange={(e) => updateStep5({ hasSalarySlips: e.target.checked })} />
-                  <Checkbox label="ITR (last 2 years)" checked={step5.hasITR} onChange={(e) => updateStep5({ hasITR: e.target.checked })} />
-                  <Checkbox label="Bank statements (last 6 months)" checked={step5.hasBankStatements} onChange={(e) => updateStep5({ hasBankStatements: e.target.checked })} />
-                  <Checkbox label="Form 16 (last 2 years)" checked={step5.hasFormSixteen} onChange={(e) => updateStep5({ hasFormSixteen: e.target.checked })} />
-                </>
-              ) : (
-                <>
-                  <Checkbox label="ITR with computation (last 3 years)" checked={step5.hasITR} onChange={(e) => updateStep5({ hasITR: e.target.checked })} />
-                  <Checkbox label="Business bank statements (last 12 months)" checked={step5.hasBankStatements} onChange={(e) => updateStep5({ hasBankStatements: e.target.checked })} />
-                  <Checkbox label="GST returns (last 12 months, if applicable)" checked={step5.hasGSTReturns} onChange={(e) => updateStep5({ hasGSTReturns: e.target.checked })} />
-                  <Checkbox label="Audited financials / CA-certified P&L and Balance Sheet" checked={step5.hasAuditedFinancials} onChange={(e) => updateStep5({ hasAuditedFinancials: e.target.checked })} />
-                </>
-              )}
-            </div>
-
-            {(!isSalaried && !step5.hasITR && !step5.hasBankStatements) && (
-              <Alert type="warning" className="mt-3">
-                ITR and bank statements are minimum documentation requirements. Without them, the application cannot proceed to underwriting.
-              </Alert>
-            )}
-          </div>
         </div>
       </Card>
 

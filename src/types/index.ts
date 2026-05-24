@@ -53,6 +53,14 @@ export interface Step1Data {
   requestedTenureMonths: number | '';
   loanPurpose: LoanPurpose | '';
   propertyType: PropertyType | '';
+  // KYC / Identity docs
+  hasAadhaar: boolean;
+  hasPAN: boolean;
+  hasAddressProof: boolean;
+  // Property docs
+  hasSaleAgreement: boolean;
+  hasTitleDeed: boolean;
+  hasBuildingApproval: boolean;
 }
 
 export interface Step2Data {

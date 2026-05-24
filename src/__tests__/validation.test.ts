@@ -12,6 +12,12 @@ describe('validateStep1', () => {
     requestedTenureMonths: 240,
     loanPurpose: 'ready_property_purchase',
     propertyType: 'flat_apartment',
+    hasAadhaar: true,
+    hasPAN: true,
+    hasAddressProof: false,
+    hasSaleAgreement: false,
+    hasTitleDeed: false,
+    hasBuildingApproval: false,
   };
 
   it('passes for valid inputs', () => {
