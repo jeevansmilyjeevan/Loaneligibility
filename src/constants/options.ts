@@ -4,6 +4,8 @@ import type {
   EmploymentType,
   RateType,
   CoApplicantRelationship,
+  UnderwritingProgram,
+  CityCategory,
 } from '../types';
 
 export interface SelectOption<T extends string = string> {
@@ -23,11 +25,47 @@ export const LOAN_PURPOSES: SelectOption<LoanPurpose>[] = [
   { value: 'top_up',                       label: 'Top-Up Loan',                     description: 'Additional loan on an existing home loan' },
 ];
 
+// Axis LAP — purposes are different from standard home loan
+export const LAP_PURPOSES: SelectOption<LoanPurpose>[] = [
+  { value: 'lap_business_purpose',   label: 'Business Requirement',   description: 'Working capital, business expansion, or equipment purchase' },
+  { value: 'lap_personal_purpose',   label: 'Personal Requirement',   description: 'Education, medical, marriage, or other personal needs' },
+  { value: 'lap_balance_transfer',   label: 'Balance Transfer',       description: 'Transfer an existing LAP from another lender for better terms' },
+  { value: 'lap_top_up',             label: 'Top-Up Loan',            description: 'Additional loan on an existing LAP with satisfactory track record' },
+];
+
 export const PROPERTY_TYPES: SelectOption<PropertyType>[] = [
   { value: 'flat_apartment',     label: 'Flat / Apartment',      description: 'Multi-storey residential unit' },
   { value: 'villa',              label: 'Villa',                 description: 'Standalone villa in a gated community' },
   { value: 'independent_house', label: 'Independent House',     description: 'Standalone house on its own plot' },
   { value: 'residential_plot',  label: 'Residential Plot',      description: 'A plot approved for residential construction' },
+];
+
+// Axis LAP — collateral property types (different from home loan property types)
+export const LAP_PROPERTY_TYPES: SelectOption<PropertyType>[] = [
+  { value: 'lap_residential',    label: 'Residential',           description: 'Self-occupied or rented residential property (flat, house, villa) — LTV up to 70%' },
+  { value: 'lap_commercial',     label: 'Commercial',            description: 'Office, shop, or commercial building — LTV up to 60%' },
+  { value: 'lap_mixed_usage',    label: 'Mixed Usage',           description: 'Partly residential, partly commercial — LTV up to 60%' },
+  { value: 'lap_plot',           label: 'Plot / Land',           description: 'Residential or commercial plot — LTV up to 60%' },
+  { value: 'lap_special_usage',  label: 'Special Usage',         description: 'School, clinic, warehouse, industrial unit, hotel — LTV up to 55%' },
+];
+
+// Axis LAP — underwriting programs
+export const UNDERWRITING_PROGRAMS: SelectOption<UnderwritingProgram>[] = [
+  { value: 'normal_income',          label: 'Normal Income Program',       description: 'Salary / ITR-based income assessment — max ₹100 Cr' },
+  { value: 'average_banking',        label: 'Average Banking (ABB)',        description: 'For customers with good banking behaviour, limited ITR — max ₹75 Cr' },
+  { value: 'gst_program',            label: 'GST Program',                  description: 'GST return-based income surrogation — max ₹75 Cr' },
+  { value: 'gross_margin',           label: 'Gross Margin Program (GMP)',   description: 'Turnover × deemed margin for self-employed — max ₹75 Cr' },
+  { value: 'gpr_doctors',            label: 'Doctors Program (GPR)',        description: 'Gross professional receipts for registered doctors — max ₹25 Cr' },
+  { value: 'liquid_income',          label: 'Liquid Income Program (LIP)',  description: 'CA-assessed cash flow for businesses — max ₹30 Cr' },
+  { value: 'repayment_track',        label: 'Repayment Track Record (RTR)', description: 'Balance transfer + top-up based on existing EMI track — max ₹30 Cr' },
+  { value: 'lease_rental_discounting', label: 'Lease Rental Discounting (LRD)', description: 'Revenue from property rentals used as income — max ₹100 Cr' },
+];
+
+// City category for Axis LAP loan cap
+export const CITY_CATEGORIES: SelectOption<CityCategory>[] = [
+  { value: 'metro_urban',  label: 'Metro / Urban',  description: 'Mumbai, Delhi, Bengaluru, Chennai, Hyderabad, Pune, Kolkata, Ahmedabad and similar large cities — max ₹7 Cr' },
+  { value: 'semi_urban',   label: 'Semi-Urban',      description: 'Tier-2 cities and large towns — max ₹5 Cr' },
+  { value: 'rural',        label: 'Rural',           description: 'Small towns and villages — max ₹3 Cr' },
 ];
 
 export const EMPLOYMENT_TYPES: SelectOption<EmploymentType>[] = [
@@ -135,9 +173,48 @@ export const BANKS: Bank[] = [
   {
     id: 'axis', name: 'Axis Bank', shortName: 'Axis', color: 'bg-violet-700',
     plans: [
-      { id: 'axis_regular',     name: 'Axis Home Loan',      description: 'Flexible home loan with competitive floating rates.', rateMin: 8.75, rateMax: 9.65, highlights: ['Zero foreclosure', 'Digital process', 'Max ₹5 Cr'] },
-      { id: 'axis_super_saver', name: 'Axis Super Saver',    description: 'Linked savings account reduces effective interest cost.', rateMin: 8.75, rateMax: 9.65, highlights: ['Linked savings', 'Interest savings', 'Flexible withdrawal'] },
-      { id: 'axis_shubh',       name: 'Axis Shubh Aarambh', description: 'Affordable housing under PMAY for first-time buyers.', rateMin: 9.40, rateMax: 13.50, highlights: ['PMAY subsidy', 'First-time buyers', 'Affordable segment'] },
+      {
+        id: 'axis_lap_normal',
+        name: 'LAP — Normal Income',
+        description: 'Loan Against Property for salaried & self-employed with standard ITR-based income documentation.',
+        rateMin: 11.00, rateMax: 13.00,
+        highlights: ['Max ₹100 Cr', 'Up to 20 yrs', 'Residential / Commercial'],
+      },
+      {
+        id: 'axis_lap_abb',
+        name: 'LAP — Average Banking (ABB)',
+        description: 'Income surrogation through 12-month average bank balance for customers with limited income proof.',
+        rateMin: 12.00, rateMax: 14.00,
+        highlights: ['ABB surrogate', 'Max ₹75 Cr', 'SEP/SENP eligible'],
+      },
+      {
+        id: 'axis_lap_gst',
+        name: 'LAP — GST / GMP Program',
+        description: 'Income derived from GST returns or Gross Margin for self-employed businesses.',
+        rateMin: 12.00, rateMax: 14.00,
+        highlights: ['GST surrogate', 'Max ₹75 Cr', 'Growing turnover preferred'],
+      },
+      {
+        id: 'axis_lap_gpr',
+        name: 'LAP — Doctors Program (GPR)',
+        description: 'Tailored for registered medical professionals (MD/MBBS/BDS) based on gross professional receipts.',
+        rateMin: 11.50, rateMax: 13.50,
+        highlights: ['Doctors only', 'Max ₹25 Cr', 'MCI registration required'],
+      },
+      {
+        id: 'axis_lap_rtr',
+        name: 'LAP — Balance Transfer / RTR',
+        description: 'Transfer your existing LAP from another lender with top-up based on clean repayment history.',
+        rateMin: 11.00, rateMax: 13.00,
+        highlights: ['12-mo clean track', 'Max ₹30 Cr', 'Top-up available'],
+      },
+      {
+        id: 'axis_lap_lrd',
+        name: 'LAP — Lease Rental Discounting',
+        description: 'Loan against commercial property where rental income from reputed tenants services the EMI.',
+        rateMin: 11.00, rateMax: 12.50,
+        highlights: ['Rent-backed', 'Max ₹100 Cr', 'MNC / Fortune 500 tenants preferred'],
+      },
     ],
   },
   {

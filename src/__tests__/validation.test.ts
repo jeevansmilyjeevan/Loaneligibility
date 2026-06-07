@@ -12,6 +12,8 @@ describe('validateStep1', () => {
     requestedTenureMonths: 240,
     loanPurpose: 'ready_property_purchase',
     propertyType: 'flat_apartment',
+    underwritingProgram: '',
+    cityCategory: '',
     hasAadhaar: true,
     hasPAN: true,
     hasAddressProof: false,

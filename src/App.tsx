@@ -1,6 +1,7 @@
 import React from 'react';
 import { WizardProvider, useWizard } from './context/WizardContext';
 import { Layout } from './components/layout/Layout';
+import { PolicyChecklist } from './pages/PolicyChecklist';
 import { Step1LoanBasics } from './components/steps/Step1LoanBasics';
 import { Step2ApplicantInfo } from './components/steps/Step2ApplicantInfo';
 import { Step3PropertyValuation } from './components/steps/Step3PropertyValuation';
@@ -70,9 +71,22 @@ function WizardContent() {
 }
 
 export default function App() {
+  const [page, setPage] = React.useState<'wizard' | 'checklist'>(() =>
+    window.location.hash === '#checklist' ? 'checklist' : 'wizard'
+  );
+
+  const navTo = (p: 'wizard' | 'checklist') => {
+    window.location.hash = p === 'checklist' ? 'checklist' : '';
+    setPage(p);
+  };
+
+  if (page === 'checklist') {
+    return <PolicyChecklist onBack={() => navTo('wizard')} />;
+  }
+
   return (
     <WizardProvider>
-      <Layout>
+      <Layout onOpenChecklist={() => navTo('checklist')}>
         <WizardContent />
       </Layout>
     </WizardProvider>

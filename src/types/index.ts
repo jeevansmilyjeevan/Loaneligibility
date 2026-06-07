@@ -10,13 +10,39 @@ export type LoanPurpose =
   | 'home_renovation'
   | 'home_extension'
   | 'balance_transfer'
-  | 'top_up';
+  | 'top_up'
+  // Axis LAP purposes
+  | 'lap_business_purpose'
+  | 'lap_personal_purpose'
+  | 'lap_balance_transfer'
+  | 'lap_top_up';
 
 export type PropertyType =
   | 'flat_apartment'
   | 'villa'
   | 'independent_house'
-  | 'residential_plot';
+  | 'residential_plot'
+  // Axis LAP property types
+  | 'lap_residential'
+  | 'lap_commercial'
+  | 'lap_mixed_usage'
+  | 'lap_plot'
+  | 'lap_special_usage';
+
+// Axis LAP underwriting programs
+export type UnderwritingProgram =
+  | 'normal_income'
+  | 'average_banking'
+  | 'gst_program'
+  | 'gross_margin'
+  | 'gpr_doctors'
+  | 'liquid_income'
+  | 'repayment_track'
+  | 'lease_rental_discounting'
+  | '';
+
+// City tier for Axis LAP max loan cap
+export type CityCategory = 'metro_urban' | 'semi_urban' | 'rural' | '';
 
 export type RateType = 'floating' | 'fixed';
 
@@ -53,6 +79,9 @@ export interface Step1Data {
   requestedTenureMonths: number | '';
   loanPurpose: LoanPurpose | '';
   propertyType: PropertyType | '';
+  // Axis LAP specific
+  underwritingProgram: UnderwritingProgram;
+  cityCategory: CityCategory;
   // KYC / Identity docs
   hasAadhaar: boolean;
   hasPAN: boolean;

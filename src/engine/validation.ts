@@ -1,4 +1,4 @@
-import { POLICY } from '../config/policy';
+import { POLICY, AXIS_LAP_POLICY } from '../config/policy';
 import type {
   Step1Data, Step2Data, Step3Data, Step4Data,
   Step5Data, Step6Data, Step7Data, Step8Data, Step9Data,
@@ -13,21 +13,25 @@ export const validateStep1: Validator<Step1Data> = (d) => {
   const errors: StepErrors = {};
   const amount = parseNum(d.desiredLoanAmount);
   const tenure = parseNum(d.requestedTenureMonths);
+  const isAxisLAP = d.selectedBank === 'axis';
+  const pol = isAxisLAP ? AXIS_LAP_POLICY : POLICY;
 
   if (amount <= 0) {
     errors.desiredLoanAmount = 'Please enter a valid loan amount.';
-  } else if (amount < POLICY.loanLimits.minAmount) {
-    errors.desiredLoanAmount = `Minimum loan amount is ₹${(POLICY.loanLimits.minAmount / 1_00_000).toFixed(0)} lakh.`;
-  } else if (amount > POLICY.loanLimits.maxAmount) {
-    errors.desiredLoanAmount = `Maximum sanctioned amount is ₹10 crore.`;
+  } else if (amount < pol.loanLimits.minAmount) {
+    errors.desiredLoanAmount = `Minimum loan amount is ₹${(pol.loanLimits.minAmount / 1_00_000).toFixed(1)} lakh.`;
+  } else if (amount > pol.loanLimits.maxAmount) {
+    errors.desiredLoanAmount = isAxisLAP
+      ? 'Requested amount exceeds the maximum of ₹100 crore for Normal Income program.'
+      : 'Maximum sanctioned amount is ₹10 crore.';
   }
 
   if (tenure <= 0) {
     errors.requestedTenureMonths = 'Please enter a valid tenure.';
-  } else if (tenure < POLICY.loanLimits.minTenureMonths) {
-    errors.requestedTenureMonths = `Minimum tenure is ${POLICY.loanLimits.minTenureMonths} months.`;
-  } else if (tenure > POLICY.loanLimits.maxTenureMonths) {
-    errors.requestedTenureMonths = `Maximum tenure is ${POLICY.loanLimits.maxTenureMonths} months (30 years).`;
+  } else if (tenure < pol.loanLimits.minTenureMonths) {
+    errors.requestedTenureMonths = `Minimum tenure is ${pol.loanLimits.minTenureMonths} months.`;
+  } else if (tenure > pol.loanLimits.maxTenureMonths) {
+    errors.requestedTenureMonths = `Maximum tenure is ${pol.loanLimits.maxTenureMonths} months (${pol.loanLimits.maxTenureMonths / 12} years).`;
   }
 
   if (!d.selectedBank) errors.selectedBank = 'Please select a bank.';
@@ -35,10 +39,17 @@ export const validateStep1: Validator<Step1Data> = (d) => {
   if (!d.loanPurpose) errors.loanPurpose = 'Please select a loan purpose.';
   if (!d.propertyType) errors.propertyType = 'Please select a property type.';
 
+  if (isAxisLAP) {
+    if (!d.underwritingProgram) errors.underwritingProgram = 'Please select an underwriting program.';
+    if (!d.cityCategory) errors.cityCategory = 'Please select the city category.';
+  }
+
   return errors;
 };
 
 // ─── Step 2 ───────────────────────────────────────────────────────────────────
+// Note: Step2 doesn't know the bank, so we use the stricter LAP age min (24)
+// when it matters — the eligibility engine enforces bank-specific thresholds.
 export const validateStep2: Validator<Step2Data> = (d) => {
   const errors: StepErrors = {};
 

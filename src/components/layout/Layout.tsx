@@ -4,7 +4,7 @@ import { SidePanel } from './SidePanel';
 import { useWizard } from '../../context/WizardContext';
 import { Button } from '../ui/Button';
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children, onOpenChecklist }: { children: React.ReactNode; onOpenChecklist?: () => void }) {
   const { state, goToStep, completeStep } = useWizard();
   const [dark, setDark] = useState<boolean>(() => {
     const stored = localStorage.getItem('darkMode');
@@ -40,14 +40,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setDark((d) => !d)}
-            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {dark ? '☀️' : '🌙'}
-          </Button>
+          <div className="flex items-center gap-2">
+            {onOpenChecklist && (
+              <Button variant="ghost" size="sm" onClick={onOpenChecklist}>
+                Policy Checklist
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDark((d) => !d)}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {dark ? '☀️' : '🌙'}
+            </Button>
+          </div>
         </div>
         {/* Stepper row */}
         <div className="w-full px-2 sm:px-6 py-2">

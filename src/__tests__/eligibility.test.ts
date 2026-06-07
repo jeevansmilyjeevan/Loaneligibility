@@ -15,6 +15,8 @@ function makeState(overrides: Partial<WizardState> = {}): WizardState {
       requestedTenureMonths: 240,
       loanPurpose: 'ready_property_purchase',
       propertyType: 'flat_apartment',
+      underwritingProgram: '' as const,
+      cityCategory: '' as const,
       hasAadhaar: true,
       hasPAN: true,
       hasAddressProof: false,
